@@ -8,7 +8,6 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 
-
 /**
  * Site controller
  */
@@ -24,7 +23,7 @@ class SiteController extends Controller
                 'class' => AccessControl::class,
                 'rules' => [
                     [
-                        'actions' => ['signup', 'login', 'error'],
+                        'actions' => ['signup', 'login','error'],
                         'allow' => true,
                     ],
                     [
@@ -32,6 +31,7 @@ class SiteController extends Controller
                         'allow' => true,
                         'roles' => ['@'],
                     ],
+
                 ],
             ],
             'verbs' => [
@@ -65,14 +65,6 @@ class SiteController extends Controller
         return $this->render('index');
     }
 
-
-    /**
-     * Login action.
-     *
-     * @return string
-     */
-
-
     public function actionLogin()
     {
         if (!Yii::$app->user->isGuest) {
@@ -92,7 +84,6 @@ class SiteController extends Controller
     public function actionLogout()
     {
         Yii::$app->user->logout();
-
         return $this->goHome();
     }
 }

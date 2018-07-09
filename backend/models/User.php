@@ -11,9 +11,6 @@ class User extends ActiveRecord implements IdentityInterface
 {
     public $password;
 
-    const STATUS_DELETED = 0;
-    const STATUS_ACTIVE = 10;
-
     public static function tableName()
     {
         return 'user';
@@ -41,7 +38,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function findIdentity($id)
     {
-        return static::findOne(['id' => $id, 'status' => self::STATUS_ACTIVE]);
+        return static::findOne(['id' => $id]);
     }
 
     /**
@@ -76,7 +73,6 @@ class User extends ActiveRecord implements IdentityInterface
         }
         return static::findOne([
             'password_reset_token' => $token,
-            'status' => self::STATUS_ACTIVE,
         ]);
     }
 
