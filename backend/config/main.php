@@ -18,7 +18,7 @@ return [
             'csrfParam' => '_csrf-backend',
         ],
         'user' => [
-            'identityClass' => 'common\models\User',
+            'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
             'identityCookie' => ['name' => '_identity-backend', 'httpOnly' => true],
 
@@ -47,16 +47,5 @@ return [
         ],
     ],
     'params' => $params,
-    'as access' => [
-        'class' => 'yii\filters\AccessControl',
-        'except' => ['site/login', 'site/error','site/logout','site/index'],
-        'rules' => [
-            [
-                'allow' => true,
-                'matchCallback' => function($rules,$action){
-                    return Yii::$app->user->identity->isAdmin;
-                }
-            ],
-        ]
-        ]
+
 ];
