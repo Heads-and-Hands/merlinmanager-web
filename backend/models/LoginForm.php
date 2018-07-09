@@ -20,7 +20,7 @@ class LoginForm extends Model
     public function rules()
     {
         return [
-            [[ 'login', 'password_hash'], 'required'],
+            [['login', 'password_hash'],'required'],
             [['login'], 'string', 'max' => 100],
             [['password_hash'], 'string', 'max' => 64],
             ['password_hash','validatePassword'],
