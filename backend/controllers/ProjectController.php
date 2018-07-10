@@ -94,7 +94,8 @@ class ProjectController extends Controller
     {
         $session = Yii::$app->session;
         // установка flash-сообщения с названием "projectDeleted"
-        $session->setFlash('projectDeleted', 'Ваш пост не был создан');
+
+        $session->setFlash('projectDeleted',Yii::t('content', 'Your project is not created!'));
         $project->delete();
     }
 

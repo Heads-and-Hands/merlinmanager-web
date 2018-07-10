@@ -45,7 +45,20 @@ return [
             'rules' => [
             ],
         ],
+        'i18n' => [
+            'translations' => [
+                'content' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@common/translations',
+                    'sourceLanguage' => 'en',
+                    'fileMap' => [
+                        'content' => 'content.php',
+                    ],
+                ],
+            ],
+        ],
     ],
     'params' => $params,
+    'language' => 'ru',
 
 ];
