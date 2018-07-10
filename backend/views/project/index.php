@@ -6,7 +6,7 @@ use yii\grid\GridView;
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Projects';
+$this->title = Yii::t('content', 'Projects');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="project-index">

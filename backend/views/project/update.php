@@ -5,10 +5,12 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\Project */
 
-$this->title = 'Update Project: ' . $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Projects', 'url' => ['index']];
+$this->title = Yii::t('content', 'Update Project: {model_name}',[
+        'model_name' => $model->name,
+]);
+$this->params['breadcrumbs'][] = ['label' =>  Yii::t('content', 'Projects'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = 'Update';
+$this->params['breadcrumbs'][] = Yii::t('content', 'Update');
 ?>
 <div class="project-update">
 
