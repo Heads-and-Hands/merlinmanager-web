@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'Your post was not created!' => 'Ваш пост не был создан ',
+    'Your project was not created!' => 'Ваш проект не был создан ',
     'Create Project' => 'Создать проект',
     'Projects' => 'Проекты',
     'Update Project: {model_name}' => 'Обновить проект: {model_name}',
