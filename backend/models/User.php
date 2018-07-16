@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models;
+namespace backend\models;
 
 use Yii;
 use yii\base\NotSupportedException;
@@ -25,6 +25,7 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             [['login', 'password'], 'required'],
             ['name', 'string'],
+            ['name', 'default','value'=>''],
             ['isAdmin', 'boolean'],
             [['login'], 'string', 'max' => 100],
             [['password_hash'], 'string', 'max' => 64],

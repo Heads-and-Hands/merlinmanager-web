@@ -1,8 +1,7 @@
 <?php
 
-namespace app\models;
+namespace backend\models;
 
-use Alchemy\Zippy\Zippy;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\behaviors\SluggableBehavior;
@@ -30,14 +29,6 @@ class Project extends \yii\db\ActiveRecord
     {
         return 'project';
     }
-
-//        $files = FileHelper::findFiles($folderName, [
-//            'filter' => function ($path) {
-//                if (is_file($path)) {
-//                    return basename($path);
-//                }
-//            }
-//        ]);
 
     public function search_file($folderName)
     {
@@ -69,7 +60,7 @@ class Project extends \yii\db\ActiveRecord
                 'slugAttribute' => 'link',
             ],
             [
-                'class' => TimestampBehavior::className(),
+                'class' => TimestampBehavior::class,
                 'createdAtAttribute' => 'date',
                 'updatedAtAttribute' => null,
                 'value' => new Expression('NOW()'),

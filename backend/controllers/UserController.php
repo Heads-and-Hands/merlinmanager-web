@@ -3,13 +3,12 @@
 namespace backend\controllers;
 
 use Yii;
-use app\models\User;
+use backend\models\User;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
-use  yii\web\Response;
 /**
  * UserController implements the CRUD actions for User model.
  */

@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models;
+namespace backend\models;
 
 use Yii;
 use yii\base\Model;
@@ -14,10 +14,18 @@ class ProjectForm extends Model
     {
         return [
             [['name','file'], 'required'],
+            ['name', 'validateName'],
             [['name'], 'string', 'max' => 100],
             [['file'], 'file',  'skipOnEmpty' => false, 'checkExtensionByMimeType' => false, 'extensions' => 'zip'],
-            [['name'], 'unique' , 'targetClass' => '\app\models\Project', 'targetAttribute' => ['name']],
+            [['name'], 'unique' , 'targetClass' => '\backend\models\Project', 'targetAttribute' => ['name']],
         ];
+    }
+
+    public function validateName($attribute)
+    {
+        if (strpos($this->name, '/') !== false) {
+            $this->addError($attribute, 'Name is incorrect');
+        }
     }
 
     /**

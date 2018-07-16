@@ -3,9 +3,8 @@
 namespace console\controllers;
 
 
-use common\models\Admin;
 use yii\console\Controller;
-use yii\helpers\ArrayHelper;
+use backend\models\User;
 
 /**
  * This is the command line tool for admins.
@@ -18,19 +17,22 @@ use yii\helpers\ArrayHelper;
  */
 class AdminController extends Controller
 {
-    /**
-     Create admin user
-     */
+
     public function actionCreate()
     {
-        $email = $this->prompt('Email:');
-        $password = $this->prompt('Password:');
-        $admin =  Admin::create($email, $password);
-        if(!$admin->validate()) {
+        $user = new User();
+        $login = $this->prompt(':login');
+        $password = $this->prompt(':Password');
+        $user->password = $password;
+        $user->setPassword($password);
+        $user->login = $login;
+        $user->isAdmin = true;
+        if(!$user->validate()) {
             print_r('Not Created');
-            print_r($admin->errors);
+            print_r($user->errors);
         } else {
-            $admin->save();
+            $user->generateAuthKey();
+            $user->save();
         }
     }
 }
