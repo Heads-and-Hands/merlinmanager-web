@@ -29,7 +29,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'link',
             //'file',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            ['class' => 'yii\grid\ActionColumn',
+                'template'=>'{view} {delete}',
+            ],
+
         ],
     ]); ?>
 </div>
