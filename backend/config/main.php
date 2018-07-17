@@ -14,11 +14,11 @@ return [
     'modules' => [],
     'components' => [
         'request' => [
-
+            'baseUrl' => '',
             'csrfParam' => '_csrf-backend',
         ],
         'user' => [
-            'identityClass' => 'app\models\User',
+            'identityClass' => 'backend\models\User',
             'enableAutoLogin' => true,
             'identityCookie' => ['name' => '_identity-backend', 'httpOnly' => true],
 

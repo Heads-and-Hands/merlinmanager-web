@@ -2,9 +2,9 @@
 
 namespace backend\controllers;
 
-use app\models\ProjectForm;
+use backend\models\ProjectForm;
 use Yii;
-use app\models\Project;
+use backend\models\Project;
 use yii\data\ActiveDataProvider;
 use yii\helpers\FileHelper;
 use yii\web\Controller;
@@ -50,7 +50,7 @@ class ProjectController extends Controller
      */
     public function actionIndex()
     {
-        if (Yii::$app->user->identity->isAdmin) {
+        if (!Yii::$app->user->identity->isAdmin) {
             $dataProvider = new ActiveDataProvider([
                 'query' => Project::find()->where(['user_id' => Yii::$app->user->identity->id]),
             ]);

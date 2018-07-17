@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models;
+namespace backend\models;
 
 use yii\base\Model;
 
@@ -27,7 +27,7 @@ class SignupForm extends Model
             [['name', 'login', 'password_hash'], 'required'],
             [['name', 'login'], 'string', 'max' => 100],
             [['password_hash'], 'string', 'max' => 64],
-            [['login'], 'unique', 'targetClass' => '\app\models\User', 'targetAttribute' => ['login']],
+            [['login'], 'unique', 'targetClass' => '\backend\models\User', 'targetAttribute' => ['login']],
         ];
     }
 

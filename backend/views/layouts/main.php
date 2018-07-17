@@ -21,7 +21,7 @@ AppAsset::register($this);
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?= Html::csrfMetaTags() ?>
-    <title><?= Html::encode($this->title) ?></title>
+    <title><?= Html::encode( Yii::t('content', 'My Application')) ?></title>
     <?php $this->head() ?>
 </head>
 <body>
@@ -38,17 +38,16 @@ AppAsset::register($this);
     ]);
 
     if (Yii::$app->user->identity->isAdmin) {
-        $menuItems[] = ['label' => 'UserList', 'url' => ['/user/index']];
+        $menuItems[] = ['label' =>  Yii::t('content', 'Users'), 'url' => ['/user/index']];
     }
     if (Yii::$app->user->isGuest) {
-        $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
+        $menuItems[] = ['label' => Yii::t('content', 'Login'), 'url' => ['/site/login']];
     }else
     {
-        $menuItems[] = ['label' => 'ProjectList', 'url' => ['/project/index']];
+        $menuItems[] = ['label' => Yii::t('content', 'Projects'), 'url' => ['/project/index']];
         $menuItems[] = '<li>'
             . Html::beginForm(['/site/logout'], 'post')
-            . Html::submitButton(
-                'Logout (' . Yii::$app->user->identity->login . ')',
+            . Html::submitButton(Yii::t('content', 'Logout').'(' . Yii::$app->user->identity->login . ')',
                 ['class' => 'btn btn-link logout']
             )
             . Html::endForm()
@@ -74,7 +73,6 @@ AppAsset::register($this);
     <div class="container">
         <p class="pull-left">&copy; <?= Html::encode(Yii::$app->name) ?> <?= date('Y') ?></p>
 
-        <p class="pull-right"><?= Yii::powered() ?></p>
     </div>
 </footer>
 
