@@ -6,6 +6,7 @@ use backend\models\ProjectForm;
 use Yii;
 use backend\models\Project;
 use yii\data\ActiveDataProvider;
+use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -77,7 +78,7 @@ class ProjectController extends Controller
         ]);
     }
 
-    public function unpacking($project)
+    public function unpacking($project,$projectList)
     {
         // Load Zippy
         $zippy = Zippy::load();
@@ -85,8 +86,14 @@ class ProjectController extends Controller
         // Open an archive
         $zipAdapter = $zippy->getAdapterFor('zip');
         $archive = $zipAdapter->open(Yii::getAlias('@filePath') . '/' . $project->file);
-        FileHelper::createDirectory($projectFolder);
-        $archive->extract($projectFolder);
+        if ($projectList == '') {
+            FileHelper::createDirectory($projectFolder);
+            $archive->extract($projectFolder);
+        }else{
+            $project = Project::findOne($projectList);
+            $projectFolder = Yii::getAlias('@filePath') . '/' . $project['name'];
+            $archive->extract($projectFolder);
+        }
         return $projectFolder;
     }
 
@@ -106,13 +113,14 @@ class ProjectController extends Controller
             $model->file = UploadedFile::getInstance($model, 'file');
             if ($model->validate()) {
                 $project = new Project();
+                $projectList = $model->projectList;
                 $project->user_id = Yii::$app->user->identity->getId();
                 $project->name = $model->name;
                 $zipFiles = Yii::$app->getSecurity()->generateRandomString();
                 $project->file = $zipFiles . '.' . $model->file->extension;
                 $model->file->saveAs(Yii::getAlias('@filePath') . '/' . $project->file);
                 if ($project->save()) {
-                    $folderName = $this->unpacking($project);
+                    $folderName = $this->unpacking($project,$projectList);
                     $result = $project->search_file($folderName);
                     if (!$result) {
                         $this->delete($project);
@@ -159,8 +167,7 @@ class ProjectController extends Controller
     }
 
 
-    public
-    function actionDelete($id)
+    public function actionDelete($id)
     {
         $this->findModel($id)->delete();
 

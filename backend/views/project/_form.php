@@ -14,6 +14,16 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
+    <?php
+    $categories = backend\models\Project::find()->all();
+    $data = yii\helpers\ArrayHelper::map($categories, 'id', 'name');
+    ?>
+
+    <?= $form->field($model, 'projectList')->dropDownList($data,[
+            'prompt' => '',
+    ])
+    ?>
+
     <?= $form->field($model, 'file')->fileInput() ?>
 
     <div class="form-group">
