@@ -48,6 +48,7 @@ class Project extends \yii\db\ActiveRecord
             [['name', 'link'], 'string', 'max' => 100],
             [['file'], 'string'],
             [['name'], 'unique'],
+            [['project_tree'],'string'],
         ];
     }
 
@@ -85,14 +86,15 @@ class Project extends \yii\db\ActiveRecord
             'date' => 'Date',
             'link' => 'Link',
             'file' => 'File',
+            'project_tree' => 'project_tree',
         ];
     }
 
     public function afterDelete()
     {
         parent::afterDelete();
-        FileHelper::unlink(Yii::getAlias('@filePath'). '/' .$this->file);
+        FileHelper::unlink(Yii::getAlias('@filePath').'/'.$this->file);
         FileHelper::removeDirectory(Yii::getAlias('@filePath'). '/' .$this->name);
-
+        FileHelper::removeDirectory(Yii::getAlias('@filePath') .'/'.$this->project_tree);
     }
 }

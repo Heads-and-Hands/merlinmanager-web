@@ -78,32 +78,38 @@ class ProjectController extends Controller
         ]);
     }
 
-    public function unpacking($project,$projectList)
+    public function unpacking($projectModel, $projectList, $model)
     {
         // Load Zippy
         $zippy = Zippy::load();
-        $projectFolder = Yii::getAlias('@filePath') . '/' . $project->name;
+        $projectFolder = Yii::getAlias('@filePath') . '/' . $projectModel->name;
         // Open an archive
         $zipAdapter = $zippy->getAdapterFor('zip');
-        $archive = $zipAdapter->open(Yii::getAlias('@filePath') . '/' . $project->file);
-        if ($projectList == '') {
+        $archive = $zipAdapter->open(Yii::getAlias('@filePath') . '/' . $projectModel->file);
+        $project = Project::findOne($projectList);
+        if ($projectList != "") {
+            $projectModel->project_tree = $project['project_tree'] . '/' . $model->name;
+            $tree = $projectModel->project_tree;
+            $projectModel->save();
+            $projectFolder = Yii::getAlias('@filePath') . '/' . $tree;
             FileHelper::createDirectory($projectFolder);
             $archive->extract($projectFolder);
-        }else{
-            $project = Project::findOne($projectList);
-            $projectFolder = Yii::getAlias('@filePath') . '/' . $project['name'];
+            return $projectFolder;
+        } else {
+            $projectModel->project_tree = $model->name;
+            $projectModel->save();
+            FileHelper::createDirectory($projectFolder);
             $archive->extract($projectFolder);
+            return $projectFolder;
         }
-        return $projectFolder;
     }
 
-    public function delete($project)
+    public function delete($projectModel)
     {
         $session = Yii::$app->session;
         // установка flash-сообщения с названием "projectDeleted"
-
-        $session->setFlash('projectDeleted',Yii::t('content', 'Your project is not created!'));
-        $project->delete();
+        $session->setFlash('projectDeleted', Yii::t('content', 'Your project is not created!'));
+        $projectModel->delete();
     }
 
     public function actionCreate()
@@ -112,22 +118,22 @@ class ProjectController extends Controller
         if ($model->load(Yii::$app->request->post())) {
             $model->file = UploadedFile::getInstance($model, 'file');
             if ($model->validate()) {
-                $project = new Project();
+                $projectModel = new Project();
                 $projectList = $model->projectList;
-                $project->user_id = Yii::$app->user->identity->getId();
-                $project->name = $model->name;
+                $projectModel->user_id = Yii::$app->user->identity->getId();
+                $projectModel->name = $model->name;
                 $zipFiles = Yii::$app->getSecurity()->generateRandomString();
-                $project->file = $zipFiles . '.' . $model->file->extension;
-                $model->file->saveAs(Yii::getAlias('@filePath') . '/' . $project->file);
-                if ($project->save()) {
-                    $folderName = $this->unpacking($project,$projectList);
-                    $result = $project->search_file($folderName);
+                $projectModel->file = $zipFiles . '.' . $model->file->extension;
+                $model->file->saveAs(Yii::getAlias('@filePath') . '/' . $projectModel->file);
+                if ($projectModel->save()) {
+                    $folderName = $this->unpacking($projectModel, $projectList, $model);
+                    $result = $projectModel->search_file($folderName);
                     if (!$result) {
-                        $this->delete($project);
+                        $this->delete($projectModel);
                         return $this->redirect(['create']);
                     }
                 }
-                return $this->redirect(['view', 'id' => $project->id]);
+                return $this->redirect(['view', 'id' => $projectModel->id]);
             }
         }
 
@@ -152,8 +158,7 @@ class ProjectController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public
-    function actionUpdate($id)
+    public function actionUpdate($id)
     {
         $model = $this->findModel($id);
 

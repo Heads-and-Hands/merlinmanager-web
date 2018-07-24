@@ -21,8 +21,8 @@ services:
       build: .
       restart: always
       ports:
-        - "28489:80"
-        - "28423:433"
+        - "28429:80"
+        - "28413:433"
       networks:
         - default
       depends_on:

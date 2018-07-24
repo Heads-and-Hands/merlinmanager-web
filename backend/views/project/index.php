@@ -28,6 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'date',
             'link',
             //'file',
+            'project_tree',
 
             ['class' => 'yii\grid\ActionColumn',
                 'template'=>'{view} {delete}',

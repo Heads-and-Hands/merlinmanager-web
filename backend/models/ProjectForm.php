@@ -2,7 +2,6 @@
 
 namespace backend\models;
 
-use Yii;
 use yii\base\Model;
 
 class ProjectForm extends Model
@@ -20,6 +19,7 @@ class ProjectForm extends Model
             [['file'], 'file',  'skipOnEmpty' => false, 'checkExtensionByMimeType' => false, 'extensions' => 'zip'],
             [['name'], 'unique' , 'targetClass' => '\backend\models\Project', 'targetAttribute' => ['name']],
             [['projectList'],'string'],
+
         ];
     }
 
