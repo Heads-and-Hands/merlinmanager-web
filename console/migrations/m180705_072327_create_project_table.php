@@ -24,7 +24,15 @@ class m180705_072327_create_project_table extends Migration
             'link' => $this->string(100)->notNull(),
             'file' => $this->string()->notNull(),
             'project_tree' => $this->string()->unique(),
+            'parent_id' => $this->integer(),
         ],$tableOptions);
+
+
+
+
+        $this->createIndex('idx-category-parent_id', '{{%project}}', 'parent_id');
+        $this->addForeignKey('fk-category-parent', '{{%project}}', 'parent_id', '{{%project}}', 'id', 'SET NULL', 'RESTRICT');
+
 
         // creates index for column `user_id`
         $this->createIndex(
@@ -32,6 +40,9 @@ class m180705_072327_create_project_table extends Migration
             'project',
             'user_id'
         );
+
+
+
 
         // add foreign key for table `user`
         $this->addForeignKey(

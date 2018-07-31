@@ -17,6 +17,8 @@ use yii\helpers\FileHelper;
  * @property string $date
  * @property string $link
  * @property string $file
+ *
+ * @property Project $project
  */
 class Project extends \yii\db\ActiveRecord
 {
@@ -30,9 +32,9 @@ class Project extends \yii\db\ActiveRecord
         return 'project';
     }
 
-    public function search_file($folderName)
+    public static function search_file($folderName)
     {
-        $files = FileHelper::findFiles($folderName,['only'=>['index.html']]);
+        $files = FileHelper::findFiles($folderName, ['only' => ['index.html']]);
         return (bool)$files;
     }
 
@@ -46,9 +48,8 @@ class Project extends \yii\db\ActiveRecord
             [['user_id'], 'integer'],
             [['date'], 'safe'],
             [['name', 'link'], 'string', 'max' => 100],
-            [['file'], 'string'],
             [['name'], 'unique'],
-            [['project_tree'],'string'],
+            [['project_tree'], 'string'],
         ];
     }
 
@@ -83,6 +84,7 @@ class Project extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Name',
             'user_id' => 'User ID',
+            'parent_id' => 'Parent ID',
             'date' => 'Date',
             'link' => 'Link',
             'file' => 'File',
@@ -93,8 +95,27 @@ class Project extends \yii\db\ActiveRecord
     public function afterDelete()
     {
         parent::afterDelete();
-        FileHelper::unlink(Yii::getAlias('@filePath').'/'.$this->file);
-        FileHelper::removeDirectory(Yii::getAlias('@filePath'). '/' .$this->name);
-        FileHelper::removeDirectory(Yii::getAlias('@filePath') .'/'.$this->project_tree);
+        FileHelper::unlink(Yii::getAlias('@filePath') . '/' . $this->file);
+        FileHelper::removeDirectory(Yii::getAlias('@filePath') . '/' . $this->name);
+        FileHelper::removeDirectory(Yii::getAlias('@filePath') . '/' . $this->project_tree);
+    }
+
+
+    public function getParent()
+    {
+        return $this->hasOne(Project::class, ['id' => 'parent_id']);
+    }
+
+    public function getTree()
+    {
+        $model = $this;
+        $str = '';
+        while ($model) {
+            $str = $model->link . "/" . $str;
+            $model = $model->parent;
+
+            //$model = $this->getParent();
+        }
+        return $str;
     }
 }

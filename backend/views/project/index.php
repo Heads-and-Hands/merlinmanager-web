@@ -28,10 +28,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'date',
             'link',
             //'file',
-            'project_tree',
-
+            //'project_tree',
+            'tree',
             ['class' => 'yii\grid\ActionColumn',
-                'template'=>'{view} {delete}',
+                //'template'=>'{view} {delete}',
             ],
 
         ],

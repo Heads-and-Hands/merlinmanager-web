@@ -6,7 +6,6 @@ use backend\models\ProjectForm;
 use Yii;
 use backend\models\Project;
 use yii\data\ActiveDataProvider;
-use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -102,6 +101,7 @@ class ProjectController extends Controller
             $archive->extract($projectFolder);
             return $projectFolder;
         }
+
     }
 
     public function delete($projectModel)
@@ -112,6 +112,7 @@ class ProjectController extends Controller
         $projectModel->delete();
     }
 
+
     public function actionCreate()
     {
         $model = new ProjectForm();
@@ -119,21 +120,24 @@ class ProjectController extends Controller
             $model->file = UploadedFile::getInstance($model, 'file');
             if ($model->validate()) {
                 $projectModel = new Project();
-                $projectList = $model->projectList;
+                $projectList = $model->parent_id;
                 $projectModel->user_id = Yii::$app->user->identity->getId();
                 $projectModel->name = $model->name;
+                $projectModel->parent_id = $model->parent_id;
                 $zipFiles = Yii::$app->getSecurity()->generateRandomString();
                 $projectModel->file = $zipFiles . '.' . $model->file->extension;
                 $model->file->saveAs(Yii::getAlias('@filePath') . '/' . $projectModel->file);
                 if ($projectModel->save()) {
                     $folderName = $this->unpacking($projectModel, $projectList, $model);
-                    $result = $projectModel->search_file($folderName);
+                    $result = Project::search_file($folderName);
                     if (!$result) {
                         $this->delete($projectModel);
                         return $this->redirect(['create']);
                     }
                 }
                 return $this->redirect(['view', 'id' => $projectModel->id]);
+            } else {
+                print_r($model->errors);
             }
         }
 
@@ -147,36 +151,54 @@ class ProjectController extends Controller
         if (($model = Project::findOne($id)) !== null) {
             return $model;
         }
-
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
-    /**
-     * Updates an existing Project model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
+
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        $project = Project::find()->where(['id' => $model->id])->one();
+        $parent_name = Project::find()->where(['id' => $model->parent_id])->one();
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->file = UploadedFile::getInstance($model, 'file')) {
+                $zipFiles = Yii::$app->getSecurity()->generateRandomString();
+                if ($model->validate()) {
+                    $model->file->saveAs(Yii::getAlias('@filePath') . '/' . $zipFiles . '.' . $model->file->extension);
+                    $model->file = $zipFiles . '.' . $model->file->extension;
+                    rename("./tmp/" . $parent_name->project_tree . '/'. $project->name ,"./tmp/" . $parent_name->project_tree . '/' . $model->name);
+                    $model->project_tree = $parent_name->project_tree . '/' . $model->name;
+                    $model->save();
+                    $projectFolder = $this->updateArchive($model, $parent_name);
+                    $result = Project::search_file($projectFolder);
+                    if (!$result) {
+                        $session = Yii::$app->session;
+                        // установка flash-сообщения с названием "projectDeleted"
+                        $session->setFlash('projectDeleted', Yii::t('content', 'Your project is not created!'));
+                        return $this->redirect(['update']);
+                    }
+                }
+            }
             return $this->redirect(['view', 'id' => $model->id]);
         }
-
         return $this->render('update', [
             'model' => $model,
         ]);
     }
 
+    public function updateArchive($model, $parent_name)
+    {
+        $zippy = Zippy::load();
+        $zipAdapter = $zippy->getAdapterFor('zip');
+        $archive = $zipAdapter->open(Yii::getAlias('@filePath') . '/' . $model->file);
+        $projectFolder = Yii::getAlias('@filePath') . '/' . $parent_name->project_tree . '/' . $model->name;
+        $archive->extract($projectFolder);
+        return $projectFolder;
+    }
 
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
-
         return $this->redirect(['index']);
     }
-
 }

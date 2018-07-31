@@ -8,7 +8,7 @@ class ProjectForm extends Model
 {
     public $name;
     public $file;
-    public $projectList;
+    public $parent_id;
 
     public function rules()
     {
@@ -18,8 +18,7 @@ class ProjectForm extends Model
             [['name'], 'string', 'max' => 100],
             [['file'], 'file',  'skipOnEmpty' => false, 'checkExtensionByMimeType' => false, 'extensions' => 'zip'],
             [['name'], 'unique' , 'targetClass' => '\backend\models\Project', 'targetAttribute' => ['name']],
-            [['projectList'],'string'],
-
+            [['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => Project::class, 'targetAttribute' => ['parent_id' => 'id']],
         ];
     }
 

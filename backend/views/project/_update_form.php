@@ -11,16 +11,7 @@ use yii\widgets\ActiveForm;
     <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
-
-    <?php
-    $projectList = backend\models\Project::find()->all();
-    $data = yii\helpers\ArrayHelper::map($projectList, 'id', 'name');
-    ?>
-
-    <?= $form->field($model, 'parent_id')->dropDownList($data,[
-            'prompt' => '',
-    ]) ?>
-
+    
     <?= $form->field($model, 'file')->fileInput() ?>
 
     <div class="form-group">
