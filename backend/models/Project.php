@@ -32,7 +32,7 @@ class Project extends \yii\db\ActiveRecord
         return 'project';
     }
 
-    public static function search_file($folderName)
+    public static function searchFile($folderName)
     {
         $files = FileHelper::findFiles($folderName, ['only' => ['index.html']]);
         return (bool)$files;
@@ -49,7 +49,6 @@ class Project extends \yii\db\ActiveRecord
             [['date'], 'safe'],
             [['name', 'link'], 'string', 'max' => 100],
             [['name'], 'unique'],
-            [['project_tree'], 'string'],
         ];
     }
 
@@ -88,7 +87,6 @@ class Project extends \yii\db\ActiveRecord
             'date' => 'Date',
             'link' => 'Link',
             'file' => 'File',
-            'project_tree' => 'project_tree',
         ];
     }
 
@@ -97,7 +95,7 @@ class Project extends \yii\db\ActiveRecord
         parent::afterDelete();
         FileHelper::unlink(Yii::getAlias('@filePath') . '/' . $this->file);
         FileHelper::removeDirectory(Yii::getAlias('@filePath') . '/' . $this->name);
-        FileHelper::removeDirectory(Yii::getAlias('@filePath') . '/' . $this->project_tree);
+        FileHelper::removeDirectory(Yii::getAlias('@filePath') . '/' . $this->getTree());
     }
 
 
@@ -113,8 +111,6 @@ class Project extends \yii\db\ActiveRecord
         while ($model) {
             $str = $model->link . "/" . $str;
             $model = $model->parent;
-
-            //$model = $this->getParent();
         }
         return $str;
     }

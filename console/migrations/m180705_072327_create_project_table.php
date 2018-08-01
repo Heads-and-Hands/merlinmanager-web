@@ -23,7 +23,6 @@ class m180705_072327_create_project_table extends Migration
             'date' => $this->date()->notNull(),
             'link' => $this->string(100)->notNull(),
             'file' => $this->string()->notNull(),
-            'project_tree' => $this->string()->unique(),
             'parent_id' => $this->integer(),
         ],$tableOptions);
 

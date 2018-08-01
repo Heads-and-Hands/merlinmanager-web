@@ -13,6 +13,7 @@ use yii\filters\VerbFilter;
 use yii\web\UploadedFile;
 use Alchemy\Zippy\Zippy;
 use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
 
 /**
  * ProjectController implements the CRUD actions for Project model.
@@ -77,26 +78,20 @@ class ProjectController extends Controller
         ]);
     }
 
-    public function unpacking($projectModel, $projectList, $model)
+    public function unpacking($projectModel, $parentId, $pathTree)
     {
         // Load Zippy
         $zippy = Zippy::load();
-        $projectFolder = Yii::getAlias('@filePath') . '/' . $projectModel->name;
         // Open an archive
         $zipAdapter = $zippy->getAdapterFor('zip');
         $archive = $zipAdapter->open(Yii::getAlias('@filePath') . '/' . $projectModel->file);
-        $project = Project::findOne($projectList);
-        if ($projectList != "") {
-            $projectModel->project_tree = $project['project_tree'] . '/' . $model->name;
-            $tree = $projectModel->project_tree;
-            $projectModel->save();
-            $projectFolder = Yii::getAlias('@filePath') . '/' . $tree;
+        if ($parentId != "") {
+            $projectFolder = Yii::getAlias('@filePath') . '/' . $pathTree;
             FileHelper::createDirectory($projectFolder);
             $archive->extract($projectFolder);
             return $projectFolder;
         } else {
-            $projectModel->project_tree = $model->name;
-            $projectModel->save();
+            $projectFolder = Yii::getAlias('@filePath') . '/' . $pathTree;
             FileHelper::createDirectory($projectFolder);
             $archive->extract($projectFolder);
             return $projectFolder;
@@ -116,34 +111,43 @@ class ProjectController extends Controller
     public function actionCreate()
     {
         $model = new ProjectForm();
-        if ($model->load(Yii::$app->request->post())) {
-            $model->file = UploadedFile::getInstance($model, 'file');
-            if ($model->validate()) {
-                $projectModel = new Project();
-                $projectList = $model->parent_id;
-                $projectModel->user_id = Yii::$app->user->identity->getId();
-                $projectModel->name = $model->name;
-                $projectModel->parent_id = $model->parent_id;
-                $zipFiles = Yii::$app->getSecurity()->generateRandomString();
-                $projectModel->file = $zipFiles . '.' . $model->file->extension;
-                $model->file->saveAs(Yii::getAlias('@filePath') . '/' . $projectModel->file);
-                if ($projectModel->save()) {
-                    $folderName = $this->unpacking($projectModel, $projectList, $model);
-                    $result = Project::search_file($folderName);
-                    if (!$result) {
-                        $this->delete($projectModel);
-                        return $this->redirect(['create']);
-                    }
-                }
-                return $this->redirect(['view', 'id' => $projectModel->id]);
-            } else {
-                print_r($model->errors);
-            }
+        $projectList = Project::find()->all();
+        $data = ArrayHelper::map($projectList, 'id', 'name');
+
+        if (!$model->load(Yii::$app->request->post())) {
+            return $this->render('create', [
+                'model' => $model,
+                'data' => $data,
+            ]);
         }
 
-        return $this->render('create', [
-            'model' => $model,
-        ]);
+        $model->file = UploadedFile::getInstance($model, 'file');
+        if (!$model->validate()) {
+            return $this->render('create', [
+                'model' => $model,
+                'data' => $data,
+            ]);
+        }
+
+        $projectModel = new Project();
+        $projectModel->user_id = Yii::$app->user->identity->getId();
+        $projectModel->name = $model->name;
+        $projectModel->parent_id = $model->parent_id;
+        $zipName = Yii::$app->getSecurity()->generateRandomString();
+        $projectModel->file = $zipName . '.' . $model->file->extension;
+        $model->file->saveAs(Yii::getAlias('@filePath') . '/' . $projectModel->file);
+
+        if ($projectModel->save()) {
+            $pathTree = $projectModel->getTree();
+            $folderName = $this->unpacking($projectModel, $model->parent_id, $pathTree);
+            $result = Project::searchFile($folderName);
+            if (!$result) {
+                $this->delete($projectModel);
+                return $this->redirect(['create']);
+            }
+        }
+        return $this->redirect(['view', 'id' => $projectModel->id]);
+
     }
 
     protected function findModel($id)
@@ -158,40 +162,57 @@ class ProjectController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $project = Project::find()->where(['id' => $model->id])->one();
-        $parent_name = Project::find()->where(['id' => $model->parent_id])->one();
-        if ($model->load(Yii::$app->request->post())) {
-            if ($model->file = UploadedFile::getInstance($model, 'file')) {
-                $zipFiles = Yii::$app->getSecurity()->generateRandomString();
-                if ($model->validate()) {
-                    $model->file->saveAs(Yii::getAlias('@filePath') . '/' . $zipFiles . '.' . $model->file->extension);
-                    $model->file = $zipFiles . '.' . $model->file->extension;
-                    rename("./tmp/" . $parent_name->project_tree . '/'. $project->name ,"./tmp/" . $parent_name->project_tree . '/' . $model->name);
-                    $model->project_tree = $parent_name->project_tree . '/' . $model->name;
-                    $model->save();
-                    $projectFolder = $this->updateArchive($model, $parent_name);
-                    $result = Project::search_file($projectFolder);
-                    if (!$result) {
-                        $session = Yii::$app->session;
-                        // установка flash-сообщения с названием "projectDeleted"
-                        $session->setFlash('projectDeleted', Yii::t('content', 'Your project is not created!'));
-                        return $this->redirect(['update']);
-                    }
-                }
-            }
-            return $this->redirect(['view', 'id' => $model->id]);
+        $pathTree = $model->getTree();
+
+        if (!$model->load(Yii::$app->request->post())) {
+            return $this->render('update', [
+                'model' => $model,
+            ]);
         }
-        return $this->render('update', [
-            'model' => $model,
-        ]);
+
+        if (!$model->file = UploadedFile::getInstance($model, 'file')) {
+            return $this->render('update', [
+                'model' => $model,
+            ]);
+        }
+
+        $zipName = Yii::$app->getSecurity()->generateRandomString();
+
+        if (!$model->validate()) {
+            return $this->render('update', [
+                'model' => $model,
+            ]);
+        }
+
+        $model->file->saveAs(Yii::getAlias('@filePath') . '/' . $zipName . '.' . $model->file->extension);
+        $model->file = $zipName . '.' . $model->file->extension;
+        rename("./tmp/" . $pathTree, "./tmp/" . $model->getTree());
+
+        if (!$model->save()) {
+            return $this->render('update', [
+                'model' => $model,
+            ]);
+        }
+
+        $tree = $model->getTree();
+        $projectFolder = $this->updateArchive($model, $tree);
+        $result = Project::searchFile($projectFolder);
+
+        if (!$result) {
+            $session = Yii::$app->session;
+            // установка flash-сообщения с названием "projectDeleted"
+            $session->setFlash('projectDeleted', Yii::t('content', 'Your project is not created!'));
+            return $this->redirect(['update']);
+        }
+        return $this->redirect(['view', 'id' => $model->id]);
     }
 
-    public function updateArchive($model, $parent_name)
+    public function updateArchive($model, $tree)
     {
         $zippy = Zippy::load();
         $zipAdapter = $zippy->getAdapterFor('zip');
         $archive = $zipAdapter->open(Yii::getAlias('@filePath') . '/' . $model->file);
-        $projectFolder = Yii::getAlias('@filePath') . '/' . $parent_name->project_tree . '/' . $model->name;
+        $projectFolder = Yii::getAlias('@filePath') . '/' . $tree;
         $archive->extract($projectFolder);
         return $projectFolder;
     }

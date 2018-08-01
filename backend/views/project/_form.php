@@ -12,11 +12,6 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-    <?php
-    $projectList = backend\models\Project::find()->all();
-    $data = yii\helpers\ArrayHelper::map($projectList, 'id', 'name');
-    ?>
-
     <?= $form->field($model, 'parent_id')->dropDownList($data,[
             'prompt' => '',
     ]) ?>
