@@ -22,9 +22,6 @@ class UserController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'denyCallback' => function ($rule, $action) {
-                    Yii::$app->response->setStatusCode(402);
-                },
                 'rules' => [
                     [
                         'allow' => true,

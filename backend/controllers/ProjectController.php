@@ -78,14 +78,15 @@ class ProjectController extends Controller
         ]);
     }
 
-    public function unpacking($projectModel, $parentId, $pathTree)
+    public function unpacking($projectModel)
     {
         // Load Zippy
         $zippy = Zippy::load();
         // Open an archive
+        $pathTree = $projectModel->getTree();
         $zipAdapter = $zippy->getAdapterFor('zip');
         $archive = $zipAdapter->open(Yii::getAlias('@filePath') . '/' . $projectModel->file);
-        if ($parentId != "") {
+        if ($projectModel->parent_id != "") {
             $projectFolder = Yii::getAlias('@filePath') . '/' . $pathTree;
             FileHelper::createDirectory($projectFolder);
             $archive->extract($projectFolder);
@@ -139,7 +140,7 @@ class ProjectController extends Controller
 
         if ($projectModel->save()) {
             $pathTree = $projectModel->getTree();
-            $folderName = $this->unpacking($projectModel, $model->parent_id, $pathTree);
+            $folderName = $this->unpacking($projectModel);
             $result = Project::searchFile($folderName);
             if (!$result) {
                 $this->delete($projectModel);
