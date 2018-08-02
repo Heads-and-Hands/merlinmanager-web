@@ -86,7 +86,7 @@ class ProjectController extends Controller
         $pathTree = $projectModel->getTree();
         $zipAdapter = $zippy->getAdapterFor('zip');
         $archive = $zipAdapter->open(Yii::getAlias('@filePath') . '/' . $projectModel->file);
-        if ($projectModel->parent_id != "") {
+        if ($projectModel->parent_id) {
             $projectFolder = Yii::getAlias('@filePath') . '/' . $pathTree;
             FileHelper::createDirectory($projectFolder);
             $archive->extract($projectFolder);
@@ -104,7 +104,7 @@ class ProjectController extends Controller
     {
         $session = Yii::$app->session;
         // установка flash-сообщения с названием "projectDeleted"
-        $session->setFlash('projectDeleted', Yii::t('content', 'Your project is not created!'));
+        $session->setFlash('projectDeleted', Yii::t('content', 'index.html not found project not created'));
         $projectModel->delete();
     }
 
