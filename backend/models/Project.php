@@ -112,11 +112,11 @@ class Project extends \yii\db\ActiveRecord
     {
         $domainModel = ProjectDomain::find()->one();
         $model = $this;
-            if ($domainModel->domain != Null){
-                $str = $domainModel->domain . '/' . $model->name;
-            }else{
-                $str =  '/' . $model->name;
-            }
+        if (!$domainModel->domain) {
+            $str = $domainModel->domain . '/' . $model->name;
+        } else {
+            $str = '/' . $model->name;
+        }
         return $str;
     }
 }
