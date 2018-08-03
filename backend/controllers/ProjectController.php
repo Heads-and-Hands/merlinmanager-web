@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\models\ProjectDomain;
 use backend\models\ProjectForm;
 use Yii;
 use backend\models\Project;
@@ -97,14 +98,10 @@ class ProjectController extends Controller
             $archive->extract($projectFolder);
             return $projectFolder;
         }
-
     }
 
     public function delete($projectModel)
     {
-        $session = Yii::$app->session;
-        // установка flash-сообщения с названием "projectDeleted"
-        $session->setFlash('projectDeleted', Yii::t('content', 'index.html not found project not created'));
         $projectModel->delete();
     }
 
@@ -137,18 +134,19 @@ class ProjectController extends Controller
         $zipName = Yii::$app->getSecurity()->generateRandomString();
         $projectModel->file = $zipName . '.' . $model->file->extension;
         $model->file->saveAs(Yii::getAlias('@filePath') . '/' . $projectModel->file);
-
         if ($projectModel->save()) {
-            $pathTree = $projectModel->getTree();
             $folderName = $this->unpacking($projectModel);
+            FileHelper::unlink(Yii::getAlias('@filePath') . '/' . $projectModel->file);
             $result = Project::searchFile($folderName);
             if (!$result) {
+                $session = Yii::$app->session;
+                // установка flash-сообщения с названием "projectDeleted"
+                $session->setFlash('projectDeleted', Yii::t('content', 'index.html not found project not created'));
                 $this->delete($projectModel);
                 return $this->redirect(['create']);
             }
         }
         return $this->redirect(['view', 'id' => $projectModel->id]);
-
     }
 
     protected function findModel($id)
@@ -198,7 +196,7 @@ class ProjectController extends Controller
         $tree = $model->getTree();
         $projectFolder = $this->updateArchive($model, $tree);
         $result = Project::searchFile($projectFolder);
-
+        FileHelper::unlink(Yii::getAlias('@filePath') . '/' . $model->file);
         if (!$result) {
             $session = Yii::$app->session;
             // установка flash-сообщения с названием "projectDeleted"

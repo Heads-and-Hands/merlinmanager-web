@@ -17,6 +17,7 @@ return [
     'Create' => 'Создать',
     'My Application' => 'Моё приложение',
     'Welcome' => 'Добро пожаловать',
+    'Domain' => 'Домен',
 
 
 

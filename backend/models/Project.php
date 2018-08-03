@@ -47,7 +47,7 @@ class Project extends \yii\db\ActiveRecord
             [['name', 'user_id', 'file'], 'required'],
             [['user_id'], 'integer'],
             [['date'], 'safe'],
-            [['name', 'link'], 'string', 'max' => 100],
+            [['name'], 'string', 'max' => 100],
             [['name'], 'unique'],
         ];
     }
@@ -55,11 +55,6 @@ class Project extends \yii\db\ActiveRecord
     public function behaviors()
     {
         return [
-            [
-                'class' => SluggableBehavior::class,
-                'attribute' => 'name',
-                'slugAttribute' => 'link',
-            ],
             [
                 'class' => TimestampBehavior::class,
                 'createdAtAttribute' => 'date',
@@ -85,7 +80,6 @@ class Project extends \yii\db\ActiveRecord
             'user_id' => 'User ID',
             'parent_id' => 'Parent ID',
             'date' => 'Date',
-            'link' => 'Link',
             'file' => 'File',
         ];
     }
@@ -93,7 +87,6 @@ class Project extends \yii\db\ActiveRecord
     public function afterDelete()
     {
         parent::afterDelete();
-        FileHelper::unlink(Yii::getAlias('@filePath') . '/' . $this->file);
         FileHelper::removeDirectory(Yii::getAlias('@filePath') . '/' . $this->name);
         FileHelper::removeDirectory(Yii::getAlias('@filePath') . '/' . $this->getTree());
     }
@@ -109,9 +102,21 @@ class Project extends \yii\db\ActiveRecord
         $model = $this;
         $str = '';
         while ($model) {
-            $str = $model->link . "/" . $str;
+            $str = $model->name . "/" . $str;
             $model = $model->parent;
         }
+        return $str;
+    }
+
+    public function getLink()
+    {
+        $domainModel = ProjectDomain::find()->one();
+        $model = $this;
+            if ($domainModel->domain != Null){
+                $str = $domainModel->domain . '/' . $model->name;
+            }else{
+                $str =  '/' . $model->name;
+            }
         return $str;
     }
 }
