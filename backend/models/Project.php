@@ -105,7 +105,6 @@ class Project extends \yii\db\ActiveRecord
             $str = $model->name . "/" . $str;
             $model = $model->parent;
         }
-
         return $str;
     }
 
@@ -118,7 +117,6 @@ class Project extends \yii\db\ActiveRecord
         } else {
             $str = '/' . $model->name;
         }
-
         return $str;
     }
 }
