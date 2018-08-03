@@ -9,13 +9,10 @@ use yii\grid\GridView;
 $this->title = Yii::t('content', 'Projects');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+
 <div class="project-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
-
-    <p>
-        <?= Html::a( Yii::t('content', 'Create'), ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,

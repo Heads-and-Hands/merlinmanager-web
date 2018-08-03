@@ -15,7 +15,6 @@ use yii\helpers\FileHelper;
  * @property string $name
  * @property int $user_id
  * @property string $date
- * @property string $link
  * @property string $file
  *
  * @property Project $project
@@ -112,7 +111,7 @@ class Project extends \yii\db\ActiveRecord
     {
         $domainModel = ProjectDomain::find()->one();
         $model = $this;
-        if (!$domainModel->domain) {
+        if ($domainModel->domain) {
             $str = $domainModel->domain . '/' . $model->name;
         } else {
             $str = '/' . $model->name;
