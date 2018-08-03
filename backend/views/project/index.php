@@ -21,16 +21,15 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-
             //'id',
             'name',
             'user_id',
             'date',
             'link',
             //'file',
-
+            'tree',
             ['class' => 'yii\grid\ActionColumn',
-                'template'=>'{view} {delete}',
+                //'template'=>'{view} {delete}',
             ],
 
         ],

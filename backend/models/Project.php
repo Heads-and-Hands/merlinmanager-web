@@ -17,6 +17,8 @@ use yii\helpers\FileHelper;
  * @property string $date
  * @property string $link
  * @property string $file
+ *
+ * @property Project $project
  */
 class Project extends \yii\db\ActiveRecord
 {
@@ -30,9 +32,9 @@ class Project extends \yii\db\ActiveRecord
         return 'project';
     }
 
-    public function search_file($folderName)
+    public static function searchFile($folderName)
     {
-        $files = FileHelper::findFiles($folderName,['only'=>['index.html']]);
+        $files = FileHelper::findFiles($folderName, ['only' => ['index.html']]);
         return (bool)$files;
     }
 
@@ -45,8 +47,7 @@ class Project extends \yii\db\ActiveRecord
             [['name', 'user_id', 'file'], 'required'],
             [['user_id'], 'integer'],
             [['date'], 'safe'],
-            [['name', 'link'], 'string', 'max' => 100],
-            [['file'], 'string'],
+            [['name'], 'string', 'max' => 100],
             [['name'], 'unique'],
         ];
     }
@@ -54,11 +55,6 @@ class Project extends \yii\db\ActiveRecord
     public function behaviors()
     {
         return [
-            [
-                'class' => SluggableBehavior::class,
-                'attribute' => 'name',
-                'slugAttribute' => 'link',
-            ],
             [
                 'class' => TimestampBehavior::class,
                 'createdAtAttribute' => 'date',
@@ -82,8 +78,8 @@ class Project extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Name',
             'user_id' => 'User ID',
+            'parent_id' => 'Parent ID',
             'date' => 'Date',
-            'link' => 'Link',
             'file' => 'File',
         ];
     }
@@ -91,8 +87,36 @@ class Project extends \yii\db\ActiveRecord
     public function afterDelete()
     {
         parent::afterDelete();
-        FileHelper::unlink(Yii::getAlias('@filePath'). '/' .$this->file);
-        FileHelper::removeDirectory(Yii::getAlias('@filePath'). '/' .$this->name);
+        FileHelper::removeDirectory(Yii::getAlias('@filePath') . '/' . $this->name);
+        FileHelper::removeDirectory(Yii::getAlias('@filePath') . '/' . $this->getTree());
+    }
 
+
+    public function getParent()
+    {
+        return $this->hasOne(Project::class, ['id' => 'parent_id']);
+    }
+
+    public function getTree()
+    {
+        $model = $this;
+        $str = '';
+        while ($model) {
+            $str = $model->name . "/" . $str;
+            $model = $model->parent;
+        }
+        return $str;
+    }
+
+    public function getLink()
+    {
+        $domainModel = ProjectDomain::find()->one();
+        $model = $this;
+            if ($domainModel->domain != Null){
+                $str = $domainModel->domain . '/' . $model->name;
+            }else{
+                $str =  '/' . $model->name;
+            }
+        return $str;
     }
 }

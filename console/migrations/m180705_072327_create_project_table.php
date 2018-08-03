@@ -14,7 +14,6 @@ class m180705_072327_create_project_table extends Migration
     {
         $tableOptions = null;
         if ($this->db->driverName === 'mysql') {
-            // http://stackoverflow.com/questions/766809/whats-the-difference-between-utf8-general-ci-and-utf8-unicode-ci
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
         }
         $this->createTable('project', [
@@ -22,9 +21,16 @@ class m180705_072327_create_project_table extends Migration
             'name' => $this->string(100)->notNull()->unique(),
             'user_id' => $this->integer()->notNull(),
             'date' => $this->date()->notNull(),
-            'link' => $this->string(100)->notNull(),
             'file' => $this->string()->notNull(),
+            'parent_id' => $this->integer(),
         ],$tableOptions);
+
+
+
+
+        $this->createIndex('idx-category-parent_id', '{{%project}}', 'parent_id');
+        $this->addForeignKey('fk-category-parent', '{{%project}}', 'parent_id', '{{%project}}', 'id', 'SET NULL', 'RESTRICT');
+
 
         // creates index for column `user_id`
         $this->createIndex(
@@ -32,6 +38,9 @@ class m180705_072327_create_project_table extends Migration
             'project',
             'user_id'
         );
+
+
+
 
         // add foreign key for table `user`
         $this->addForeignKey(
