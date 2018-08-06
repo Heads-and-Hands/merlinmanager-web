@@ -130,7 +130,6 @@ class Project extends \yii\db\ActiveRecord
             } else {
                 $str = $domain . '/' . $model->name;
             }
-
         } else {
             $str = '/' . $model->name;
         }
