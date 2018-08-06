@@ -16,17 +16,15 @@ services:
         MYSQL_USER: admin
         MYSQL_PASSWORD: root
       volumes:
-        - "./db:/var/lib/mysql"
+        - "/var/www/share/merlin-web/db:/var/lib/mysql"
   app:
       build: .
       restart: always
       ports:
-        - "28480:80"
-        - "28433:433"
+        - "10080:80"
       networks:
         - default
       depends_on:
         - db
       volumes:
-       - "/var/www/merlinmanager-web:/app"
-
+        - "/var/www/merlinmanager-web:/app"

@@ -24,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'name',
             'user_id',
             'date',
-            'link',
+            'link:html',
             //'file',
             'tree',
             ['class' => 'yii\grid\ActionColumn',

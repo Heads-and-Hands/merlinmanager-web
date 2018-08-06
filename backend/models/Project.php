@@ -5,6 +5,8 @@ use yii\behaviors\TimestampBehavior;
 use yii\behaviors\SluggableBehavior;
 use yii\db\Expression;
 use yii\helpers\FileHelper;
+use yii\helpers\Html;
+
 /**
  * This is the model class for table "project".
  *
@@ -28,7 +30,7 @@ class Project extends \yii\db\ActiveRecord
     }
     public static function searchFile($folderName)
     {
-        $files = FileHelper::findFiles($folderName, ['only' => ['index.html']]);
+        $files = FileHelper::findFiles($folderName, ['only' => ['index.html'] ,'recursive'=>FALSE]);
         return (bool)$files;
     }
     /**
@@ -111,7 +113,7 @@ class Project extends \yii\db\ActiveRecord
         $domain = $domainModel->domain;
         if ($domain) {
             if (substr($domain, strlen($domain) - 1) == "/") {
-                $str = $domain . $model->name;
+                $str = Html::a($domain . $model->name ,$domain . $model->name);
             } else {
                 $str = $domain . '/' . $model->name;
             }
