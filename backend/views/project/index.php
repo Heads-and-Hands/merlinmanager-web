@@ -16,7 +16,6 @@ $this->params['breadcrumbs'][] = $this->title;
     <p>
         <?= Html::a( Yii::t('content', 'Create'), ['create'], ['class' => 'btn btn-success']) ?>
     </p>
-
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'columns' => [
