@@ -107,18 +107,30 @@ class Project extends \yii\db\ActiveRecord
         return $str;
     }
 
+    public function getFullPath()
+    {
+        $model = $this;
+        $str = '';
+        while ($model) {
+            $str = $model->name . DIRECTORY_SEPARATOR . $str;
+            $model = $model->parent;
+        }
+        $path = Yii::getAlias('@filePath') . DIRECTORY_SEPARATOR . $str;
+        return $path;
+    }
+
     public function getLink()
     {
         $domainModel = ProjectDomain::find()->one();
         $model = $this;
         $domain = $domainModel->domain;
         if ($domain) {
-            if (substr($domain, strlen($domain)-1) == "/"){
+            if (substr($domain, strlen($domain) - 1) == "/") {
                 $str = $domain . $model->name;
-            }else{
-                $str = $domain .'/'. $model->name;
+            } else {
+                $str = $domain . '/' . $model->name;
             }
-        }  else {
+        } else {
             $str = '/' . $model->name;
         }
         return $str;
