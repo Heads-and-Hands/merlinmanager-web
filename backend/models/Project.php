@@ -135,5 +135,4 @@ class Project extends \yii\db\ActiveRecord
             $str = '/' . $model->name;
         }
         return $str;
-    }
 }
