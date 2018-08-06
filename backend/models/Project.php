@@ -107,7 +107,7 @@ class Project extends \yii\db\ActiveRecord
         return $str;
     }
 
-    public function  getFullPath()
+    public function getFullPath()
     {
         $model = $this;
         $str = '';
@@ -125,12 +125,13 @@ class Project extends \yii\db\ActiveRecord
         $model = $this;
         $domain = $domainModel->domain;
         if ($domain) {
-            if (substr($domain, strlen($domain)-1) == "/"){
+            if (substr($domain, strlen($domain) - 1) == "/") {
                 $str = $domain . $model->name;
-            }else{
-                $str = $domain .'/'. $model->name;
+            } else {
+                $str = $domain . '/' . $model->name;
             }
-        }  else {
+
+        } else {
             $str = '/' . $model->name;
         }
         return $str;
