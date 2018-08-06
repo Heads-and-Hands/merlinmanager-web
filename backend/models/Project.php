@@ -111,8 +111,13 @@ class Project extends \yii\db\ActiveRecord
     {
         $domainModel = ProjectDomain::find()->one();
         $model = $this;
-        if ($domainModel->domain) {
-            $str = $domainModel->domain . '/' . $model->name;
+        $domain = $domainModel->domain;
+        if ($domain) {
+            if (substr($domain, strlen($domain)-1) == "/"){
+                $str = $domain . $model->name;
+            }else{
+                $str = $domain .'/'. $model->name;
+            }
         } else {
             $str = '/' . $model->name;
         }
