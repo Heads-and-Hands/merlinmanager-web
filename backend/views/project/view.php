@@ -34,7 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'date',
             'link',
             //'file',
-            'tree',
+            'FullPath',
         ],]) ?>
 
 </div>
