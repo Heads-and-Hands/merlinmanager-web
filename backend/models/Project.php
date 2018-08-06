@@ -1,13 +1,10 @@
 <?php
-
 namespace backend\models;
-
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\behaviors\SluggableBehavior;
 use yii\db\Expression;
 use yii\helpers\FileHelper;
-
 /**
  * This is the model class for table "project".
  *
@@ -22,7 +19,6 @@ use yii\helpers\FileHelper;
 class Project extends \yii\db\ActiveRecord
 {
     public $zipFile;
-
     /**
      * {@inheritdoc}
      */
@@ -30,13 +26,11 @@ class Project extends \yii\db\ActiveRecord
     {
         return 'project';
     }
-
     public static function searchFile($folderName)
     {
         $files = FileHelper::findFiles($folderName, ['only' => ['index.html']]);
         return (bool)$files;
     }
-
     /**
      * {@inheritdoc}
      */
@@ -50,7 +44,6 @@ class Project extends \yii\db\ActiveRecord
             [['name'], 'unique'],
         ];
     }
-
     public function behaviors()
     {
         return [
@@ -62,12 +55,10 @@ class Project extends \yii\db\ActiveRecord
             ],
         ];
     }
-
     public function getUser()
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
-
     /**
      * {@inheritdoc}
      */
@@ -82,20 +73,16 @@ class Project extends \yii\db\ActiveRecord
             'file' => 'File',
         ];
     }
-
     public function afterDelete()
     {
         parent::afterDelete();
         FileHelper::removeDirectory(Yii::getAlias('@filePath') . '/' . $this->name);
         FileHelper::removeDirectory(Yii::getAlias('@filePath') . '/' . $this->getTree());
     }
-
-
     public function getParent()
     {
         return $this->hasOne(Project::class, ['id' => 'parent_id']);
     }
-
     public function getTree()
     {
         $model = $this;
@@ -106,7 +93,6 @@ class Project extends \yii\db\ActiveRecord
         }
         return $str;
     }
-
     public function getFullPath()
     {
         $model = $this;
@@ -118,7 +104,6 @@ class Project extends \yii\db\ActiveRecord
         $path = Yii::getAlias('@filePath') . DIRECTORY_SEPARATOR . $str;
         return $path;
     }
-
     public function getLink()
     {
         $domainModel = ProjectDomain::find()->one();
