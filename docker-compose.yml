@@ -27,4 +27,6 @@ services:
         - default
       depends_on:
         - db
+      volumes:
+        - "./:/"
 
