@@ -1,12 +1,11 @@
 <?php
-
 namespace backend\models;
-
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\behaviors\SluggableBehavior;
 use yii\db\Expression;
 use yii\helpers\FileHelper;
+use yii\helpers\Html;
 
 /**
  * This is the model class for table "project".
@@ -22,7 +21,6 @@ use yii\helpers\FileHelper;
 class Project extends \yii\db\ActiveRecord
 {
     public $zipFile;
-
     /**
      * {@inheritdoc}
      */
@@ -30,13 +28,11 @@ class Project extends \yii\db\ActiveRecord
     {
         return 'project';
     }
-
     public static function searchFile($folderName)
     {
-        $files = FileHelper::findFiles($folderName, ['only' => ['index.html']]);
+        $files = FileHelper::findFiles($folderName, ['only' => ['index.html'] ,'recursive'=>FALSE]);
         return (bool)$files;
     }
-
     /**
      * {@inheritdoc}
      */
@@ -50,7 +46,6 @@ class Project extends \yii\db\ActiveRecord
             [['name'], 'unique'],
         ];
     }
-
     public function behaviors()
     {
         return [
@@ -62,12 +57,10 @@ class Project extends \yii\db\ActiveRecord
             ],
         ];
     }
-
     public function getUser()
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
-
     /**
      * {@inheritdoc}
      */
@@ -82,20 +75,16 @@ class Project extends \yii\db\ActiveRecord
             'file' => 'File',
         ];
     }
-
     public function afterDelete()
     {
         parent::afterDelete();
         FileHelper::removeDirectory(Yii::getAlias('@filePath') . '/' . $this->name);
         FileHelper::removeDirectory(Yii::getAlias('@filePath') . '/' . $this->getTree());
     }
-
-
     public function getParent()
     {
         return $this->hasOne(Project::class, ['id' => 'parent_id']);
     }
-
     public function getTree()
     {
         $model = $this;
@@ -118,7 +107,6 @@ class Project extends \yii\db\ActiveRecord
         $path = Yii::getAlias('@filePath') . DIRECTORY_SEPARATOR . $str;
         return $path;
     }
-
     public function getLink()
     {
         $domainModel = ProjectDomain::find()->one();
@@ -126,12 +114,12 @@ class Project extends \yii\db\ActiveRecord
         $domain = $domainModel->domain;
         if ($domain) {
             if (substr($domain, strlen($domain) - 1) == "/") {
-                $str = $domain . $model->name;
+                $str = Html::a($domain . $model->name ,$domain . $model->name);
             } else {
-                $str = $domain . '/' . $model->name;
+                $str = Html::a($domain . '/' . $model->name,$domain . '/' . $model->name);
             }
         } else {
-            $str = '/' . $model->name;
+            $str = Html::a('/' . $model->name,'/' . $model->name);
         }
         return $str;
     }
