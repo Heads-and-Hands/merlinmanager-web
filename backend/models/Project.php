@@ -4,13 +4,11 @@ namespace backend\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
-use yii\behaviors\SluggableBehavior;
 use yii\db\Expression;
-use yii\db\Query;
 use yii\helpers\FileHelper;
 use yii\helpers\Html;
 use yii\db\ActiveRecord;
-use yii\data\ActiveDataProvider;
+
 
 /**
  * This is the model class for table "project".
@@ -143,6 +141,5 @@ class Project extends ActiveRecord
         }
         return $str;
     }
-
 }
 
