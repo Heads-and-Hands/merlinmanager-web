@@ -5,17 +5,19 @@ namespace backend\models;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\db\ActiveRecord;
+use yii\db\Expression;
+use yii\db\Query;
 use yii\web\IdentityInterface;
 
 class User extends ActiveRecord implements IdentityInterface
 {
     public $password;
+    public $password_repeat;
 
     public static function tableName()
     {
         return 'user';
     }
-
 
     /**
      * {@inheritdoc}
@@ -23,13 +25,14 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['login', 'password'], 'required'],
+            [['login', 'password', 'password_repeat'], 'required'],
             ['name', 'string'],
-            ['name', 'default','value'=>''],
+            ['name', 'default', 'value' => ''],
             ['isAdmin', 'boolean'],
             [['login'], 'string', 'max' => 100],
             [['password_hash'], 'string', 'max' => 64],
             [['password'], 'string', 'max' => 56],
+            [['password_repeat'], 'string', 'max' => 56],
             [['login'], 'unique'],
         ];
     }
@@ -163,4 +166,15 @@ class User extends ActiveRecord implements IdentityInterface
         $this->password_reset_token = null;
     }
 
+    public function getQuantity()
+    {
+        $query = (new Query())->select(['user_id','count' => new Expression('count(user_id)')])
+            ->from('project')
+            ->groupBy('user_id')->all();
+        foreach ($query as $value){
+            if ($value['user_id'] == $this->id)
+                return $value['count'];
+        }
+
+    }
 }

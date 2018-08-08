@@ -18,7 +18,7 @@ return [
     'My Application' => 'Моё приложение',
     'Welcome' => 'Добро пожаловать',
     'Domain' => 'Домен',
-
+    'User not created, passwords do not match' => 'Пользователь не создан, пароли не совпадают',
 
 
 ];

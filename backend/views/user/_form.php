@@ -16,7 +16,9 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'login')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'password')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'password')->PasswordInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'password_repeat')->PasswordInput(['maxlength' => true]) ?>
 
     <?= $form->field($model,'isAdmin')->checkbox() ?>
 
