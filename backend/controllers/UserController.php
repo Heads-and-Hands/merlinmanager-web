@@ -2,9 +2,11 @@
 
 namespace backend\controllers;
 
+use backend\models\Project;
 use Yii;
 use backend\models\User;
 use yii\data\ActiveDataProvider;
+use yii\db\Expression;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -48,7 +50,9 @@ class UserController extends Controller
     public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => User::find(),
+            'query' => User::find()->select(['user.*', new Expression('count(*) as project_count')])
+                ->leftJoin(Project::tableName(), 'user.id=project.user_id')
+                ->groupBy('user.id'),
         ]);
 
         return $this->render('index', [

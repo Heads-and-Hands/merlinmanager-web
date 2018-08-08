@@ -108,38 +108,38 @@ class Project extends ActiveRecord
         return $str;
     }
 
-    public function getFullPath()
+    public function getPath($separator)
     {
         $model = $this;
         $str = '';
         while ($model) {
-            $str = $model->name . DIRECTORY_SEPARATOR . $str;
+            $str = $model->name . $separator . $str;
             $model = $model->parent;
         }
-        $path = Yii::getAlias('@filePath') . DIRECTORY_SEPARATOR . $str;
+        return $str;
+    }
+
+    public function getFullPath()
+    {
+        $path = Yii::getAlias('@filePath') . DIRECTORY_SEPARATOR . $this->getPath(DIRECTORY_SEPARATOR);
         return $path;
     }
 
     public function getLink()
     {
-        $str = '';
         $domainModel = ProjectDomain::find()->one();
-        $model = $this;
-        while ($model) {
-            $str = $model->name . '/' . $str;
-            $model = $model->parent;
-        }
+        $str = $this->getPath('/');
         $domain = $domainModel->domain;
         if ($domain) {
-            if (substr($domain, strlen($domain) - 1) == "/") {
-                $str = Html::a($domain . $str, $domain . $model->name);
+            if (substr($domain, strlen($domain) - 1) == '/') {
+                $str = $domain . $str;
             } else {
-                $str = Html::a($str, $domain . '/' . $model->name);
+                $str = $domain . '/' . $str;
             }
         } else {
-            $str = Html::a('/' . $str, '/' . $str);
+            $str = '/' . $str;
         }
-        return $str;
+        return Html::a($str, $str);
     }
 }
 

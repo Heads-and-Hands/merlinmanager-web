@@ -5,14 +5,15 @@ namespace backend\models;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\db\ActiveRecord;
-use yii\db\Expression;
-use yii\db\Query;
+use yii\helpers\Html;
 use yii\web\IdentityInterface;
 
 class User extends ActiveRecord implements IdentityInterface
 {
     public $password;
     public $password_repeat;
+
+    public $project_count;
 
     public static function tableName()
     {
@@ -168,13 +169,6 @@ class User extends ActiveRecord implements IdentityInterface
 
     public function getQuantity()
     {
-        $query = (new Query())->select(['user_id','count' => new Expression('count(user_id)')])
-            ->from('project')
-            ->groupBy('user_id')->all();
-        foreach ($query as $value){
-            if ($value['user_id'] == $this->id)
-                return $value['count'];
-        }
-
+        return Html::a($this->project_count ,['/project/index', 'ProjectSearch[user.login]' => $this->login]);
     }
 }
