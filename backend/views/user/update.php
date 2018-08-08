@@ -13,7 +13,7 @@ $this->params['breadcrumbs'][] = 'Update';
 <div class="user-update">
 
     <h1><?= Html::encode($this->title) ?></h1>
-
+    <?= Yii::$app->session->getFlash('user'); ?>
     <?= $this->render('_form', [
         'model' => $model,
     ]) ?>

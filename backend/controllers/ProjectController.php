@@ -2,8 +2,9 @@
 
 namespace backend\controllers;
 
-use backend\models\ProjectDomain;
 use backend\models\ProjectForm;
+use backend\models\ProjectSearch;
+use backend\models\ProjeSearch;
 use Yii;
 use backend\models\Project;
 use yii\data\ActiveDataProvider;
@@ -57,8 +58,14 @@ class ProjectController extends Controller
                 'query' => Project::find()->where(['user_id' => Yii::$app->user->identity->id]),
             ]);
         } else {
-            $dataProvider = new ActiveDataProvider([
-                'query' => Project::find(),
+            $searchModel = new ProjectSearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+            $projectList = Project::find()->all();
+            $data = ArrayHelper::map($projectList, 'user.login', 'user.login');
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+                'data' => $data,
             ]);
         }
         return $this->render('index', [
@@ -108,8 +115,14 @@ class ProjectController extends Controller
 
     public function actionCreate()
     {
+
         $model = new ProjectForm();
-        $projectList = Project::find()->all();
+        if (Yii::$app->user->identity->isAdmin) {
+            $projectList = Project::find()->all();
+        }else{
+            $projectList = Project::find()->where(['user_id' => Yii::$app->user->identity->getId()])->all();
+        }
+
         $data = ArrayHelper::map($projectList, 'id', 'name');
 
         if (!$model->load(Yii::$app->request->post())) {

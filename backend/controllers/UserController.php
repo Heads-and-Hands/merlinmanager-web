@@ -79,10 +79,12 @@ class UserController extends Controller
     {
         $model = new User();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $model->generateAuthKey();
-            $model->setPassword($model->password);
-            if ($model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+            if ($model->password_repeat == $model->password){
+                $model->generateAuthKey();
+                $model->setPassword($model->password);
+                if ($model->save()) {
+                    return $this->redirect(['view', 'id' => $model->id]);
+                }
             }
         }
 
@@ -102,6 +104,14 @@ class UserController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            if ($model->password_repeat != $model->password){
+                $session = Yii::$app->session;
+                // установка flash-сообщения с названием "projectDeleted"
+                $session->setFlash('user', Yii::t('content', 'User not created, passwords do not match'));
+                return $this->render('update', [
+                    'model' => $model,
+                ]);
+            }
             $model->setPassword($model->password);
             if ($model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);

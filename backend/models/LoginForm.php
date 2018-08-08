@@ -1,10 +1,7 @@
 <?php
-
 namespace backend\models;
-
 use Yii;
 use yii\base\Model;
-
 /**
  * Login form
  */
@@ -26,7 +23,6 @@ class LoginForm extends Model
             ['password_hash','validatePassword'],
         ];
     }
-
     /**
      * Validates the password.
      * This method serves as the inline validation for password.
@@ -43,7 +39,6 @@ class LoginForm extends Model
             }
         }
     }
-
     /**
      * Logs in a user using the provided username and password.
      *
@@ -54,10 +49,8 @@ class LoginForm extends Model
         if ($this->validate()) {
             return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0);
         }
-
         return false;
     }
-
     /**
      * Finds user by [[username]]
      *

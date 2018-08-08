@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
             //'password_hash',
             //'auth_key',
             'isAdmin:boolean',
-
+            'quantity',
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>

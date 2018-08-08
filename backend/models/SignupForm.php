@@ -1,9 +1,6 @@
 <?php
-
 namespace backend\models;
-
 use yii\base\Model;
-
 /**
  * This is the model class for table "User".
  *
@@ -16,11 +13,9 @@ use yii\base\Model;
  */
 class SignupForm extends Model
 {
-
     public $name;
     public $login;
     public $password_hash;
-
     public function rules()
     {
         return [
@@ -30,7 +25,6 @@ class SignupForm extends Model
             [['login'], 'unique', 'targetClass' => '\backend\models\User', 'targetAttribute' => ['login']],
         ];
     }
-
     /**
      * {@inheritdoc}
      */
