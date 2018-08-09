@@ -14,9 +14,11 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'parent_id')->dropDownList($data,[
             'prompt' => '',
-    ]) ?>
+    ])->label('Parent') ?>
 
-    <?= $form->field($model, 'file')->fileInput() ?>
+    <?= $form->field($model, 'file')->fileInput()->label('Archive') ?>
+
+    <?= $form->field($model, 'fileIndex')->fileInput()->label('File') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
