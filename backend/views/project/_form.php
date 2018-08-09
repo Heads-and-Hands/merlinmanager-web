@@ -18,6 +18,8 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'file')->fileInput()->label('Archive') ?>
 
+    <?= Html::tag('p',Yii::t('content','or')) ?>
+
     <?= $form->field($model, 'fileIndex')->fileInput()->label('File') ?>
 
     <div class="form-group">
