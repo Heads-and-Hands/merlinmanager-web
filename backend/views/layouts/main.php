@@ -39,7 +39,7 @@ AppAsset::register($this);
 
     if (Yii::$app->user->identity->isAdmin) {
         $menuItems[] = ['label' =>  Yii::t('content', 'Users'), 'url' => ['/user/index']];
-        $menuItems[] = ['label' =>  Yii::t('content', 'Domain'), 'url' => ['/domain/index']];
+        $menuItems[] = ['label' =>  Yii::t('content', 'Settings'), 'url' => ['/domain/index']];
     }
     if (Yii::$app->user->isGuest) {
         $menuItems[] = ['label' => Yii::t('content', 'Login'), 'url' => ['/site/login']];
