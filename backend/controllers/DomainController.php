@@ -1,7 +1,5 @@
 <?php
-
 namespace backend\controllers;
-
 use Alchemy\Zippy\Zippy;
 use backend\models\DomainForm;
 use function PHPSTORM_META\elementType;
@@ -13,7 +11,6 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\UploadedFile;
-
 /**
  * DomainController implements the CRUD actions for ProjectDomain model.
  */
@@ -33,7 +30,6 @@ class DomainController extends Controller
             ],
         ];
     }
-
     /**
      * Lists all ProjectDomain models.
      * @return mixed
@@ -43,12 +39,10 @@ class DomainController extends Controller
         $dataProvider = new ActiveDataProvider([
             'query' => ProjectDomain::find(),
         ]);
-
         return $this->render('index', [
             'dataProvider' => $dataProvider,
         ]);
     }
-
     /**
      * Displays a single ProjectDomain model.
      * @param integer $id
@@ -61,8 +55,6 @@ class DomainController extends Controller
             'model' => $this->findModel($id),
         ]);
     }
-
-
     /**
      * Updates an existing ProjectDomain model.
      * If update is successful, the browser will be redirected to the 'view' page.
@@ -81,23 +73,22 @@ class DomainController extends Controller
                 'model' => $domainForm,
             ]);
         }
-
         $domainForm->file = UploadedFile::getInstance($domainForm, 'file');
         if (!$domainForm->validate()) {
             return $this->render('update', [
                 'model' => $domainForm,
             ]);
         }
-
         $model->domain = $domainForm->domain;
         if (!$model->save()) {
             return $this->render('update', [
                 'model' => $domainForm,
             ]);
         }
-
+        if ($domainForm->file->name){
         $projectFolder = $this->updateArchive($domainForm);
         FileHelper::unlink(Yii::getAlias('@webPath') . '/' . $domainForm->file->name);
+        }
         if (!$projectFolder){
             return $this->render('update', [
                 'model' => $domainForm,
@@ -105,7 +96,6 @@ class DomainController extends Controller
         }
         return $this->redirect(['view', 'id' => $domainForm->id]);
     }
-
     public function updateArchive($domainForm)
     {
         $domainForm->file->saveAs(Yii::getAlias('@webPath') . '/' . $domainForm->file->name);
@@ -115,7 +105,6 @@ class DomainController extends Controller
         $archive->extract(Yii::getAlias('@webPath'));
         return true;
     }
-
     /**
      * Finds the ProjectDomain model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
@@ -128,7 +117,6 @@ class DomainController extends Controller
         if (($model = ProjectDomain::findOne($id)) !== null) {
             return $model;
         }
-
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 }
