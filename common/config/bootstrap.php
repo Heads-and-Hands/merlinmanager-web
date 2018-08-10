@@ -8,3 +8,6 @@ Yii::setAlias('@rscPath', dirname(dirname(__DIR__)). DIRECTORY_SEPARATOR
     . join(DIRECTORY_SEPARATOR,['backend','web','rsc']));
 Yii::setAlias('@filePath', dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR
     . join(DIRECTORY_SEPARATOR, ['backend', 'web', 'tmp']));
+Yii::setAlias('@webPath', dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR
+    . join(DIRECTORY_SEPARATOR, ['backend', 'web']));
+

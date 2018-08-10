@@ -1,13 +1,10 @@
 <?php
-
 use yii\helpers\Html;
 use yii\widgets\DetailView;
-
 /* @var $this yii\web\View */
 /* @var $model backend\models\ProjectDomain */
-
-$this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Project Domains', 'url' => ['index']];
+$this->title = $model->domain;
+$this->params['breadcrumbs'][] = ['label' => Yii::t('content','View settings'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="project-domain-view">

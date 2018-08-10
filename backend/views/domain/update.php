@@ -5,10 +5,10 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model backend\models\ProjectDomain */
 
-$this->title = 'Update Project Domain: ' . $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Project Domains', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = 'Update';
+$this->title = Yii::t('content','Settings') .': '. $model->domain;
+$this->params['breadcrumbs'][] = ['label' => Yii::t('content','Settings'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => $model->domain, 'url' => ['view', 'id' => $model->id]];
+$this->params['breadcrumbs'][] =  Yii::t('content','Update Settings');
 ?>
 <div class="project-domain-update">
 
