@@ -95,9 +95,10 @@ class DomainController extends Controller
                 'model' => $domainForm,
             ]);
         }
-
+        if ($domainForm->file->name){
         $projectFolder = $this->updateArchive($domainForm);
         FileHelper::unlink(Yii::getAlias('@webPath') . '/' . $domainForm->file->name);
+        }
         if (!$projectFolder){
             return $this->render('update', [
                 'model' => $domainForm,
