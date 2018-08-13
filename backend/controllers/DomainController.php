@@ -4,7 +4,6 @@ namespace backend\controllers;
 
 use Alchemy\Zippy\Zippy;
 use backend\models\DomainForm;
-use function PHPSTORM_META\elementType;
 use Yii;
 use backend\models\ProjectDomain;
 use yii\data\ActiveDataProvider;

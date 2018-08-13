@@ -9,7 +9,6 @@ use yii\helpers\FileHelper;
 use yii\helpers\Html;
 use yii\db\ActiveRecord;
 
-
 /**
  * This is the model class for table "project".
  *

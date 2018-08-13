@@ -12,7 +12,6 @@ class User extends ActiveRecord implements IdentityInterface
 {
     public $password;
     public $password_repeat;
-
     public $project_count;
 
     public static function tableName()
