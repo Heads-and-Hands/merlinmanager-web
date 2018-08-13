@@ -20,7 +20,6 @@ class ProjectForm extends Model
             [['name'], 'string', 'max' => 100],
             [['file'], 'file', 'checkExtensionByMimeType' => false, 'extensions' => 'zip'],
             [['fileIndex'], 'file', 'checkExtensionByMimeType' => false, 'extensions' => 'html'],
-            [['name'], 'unique', 'targetClass' => '\backend\models\Project', 'targetAttribute' => ['name']],
             [['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => Project::class, 'targetAttribute' => ['parent_id' => 'id']],
             ['file', 'required', 'when' => function ($model) { return !$model->fileIndex;},
                 'whenClient' => "function (attribute, value) { return false}"],

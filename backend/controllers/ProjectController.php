@@ -230,8 +230,11 @@ class ProjectController extends Controller
         }
 
         $pathTree = $model->getTree();
-        $model->name = $projectForm->name;
-        rename("./tmp/" . $pathTree, "./tmp/" . $model->getTree());
+        if ($projectForm->name != $model->name){
+            $model->name = $projectForm->name;
+            rename("./tmp/" . $pathTree, "./tmp/" . $model->getTree());
+        }
+
 
         if (!$model->save()) {
             return $this->render('update', [
