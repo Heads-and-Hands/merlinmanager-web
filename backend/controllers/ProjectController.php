@@ -177,7 +177,9 @@ class ProjectController extends Controller
         if ($projectModel->save()) {
 
             $folderName = $this->unpacking($projectModel, $model);
-            FileHelper::unlink(Yii::getAlias('@filePath') . '/' . $projectModel->file);
+            if ($projectModel->file != 'index.html'){
+                FileHelper::unlink(Yii::getAlias('@filePath') . '/' . $projectModel->file);
+            }
             $result = Project::searchFile($folderName);
             if (!$result) {
                 $session = Yii::$app->session;
