@@ -105,15 +105,17 @@ class ProjectController extends Controller
 
         if ($projectModel->save()) {
             $folderName = $this->unpacking($projectModel, $model);
-            if ($model->file) {
+            if ($model->file != 'index.html') {
                 FileHelper::unlink(Yii::getAlias('@filePath') . '/' . $projectModel->file);
             }
 
             $result = Project::searchFile($folderName);
             if (!$result) {
-                $this->handleError($this->action->id);
+                $session = Yii::$app->session;
+                // установка flash-сообщения с названием "projectDeleted"
+                $session->setFlash('projectDeleted', Yii::t('content', 'Your project is not created!'));
+                return $this->redirect(['create']);
             }
-
             return $this->redirect(['view', 'id' => $projectModel->id]);
         }
 
@@ -233,7 +235,7 @@ class ProjectController extends Controller
         $session = Yii::$app->session;
         // установка flash-сообщения с названием "projectDeleted"
         $session->setFlash('projectDeleted', Yii::t('content', 'Your project is not created!'));
-        return $this->redirect([$action]);
+        return $this->redirect(['create']);
     }
 
     protected function findModel($id)
