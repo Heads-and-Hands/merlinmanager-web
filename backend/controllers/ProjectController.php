@@ -102,15 +102,12 @@ class ProjectController extends Controller
         $projectModel->name = $model->name;
         $projectModel->parent_id = $model->parent_id;
         $projectModel = $this->setFile($model, $projectModel);
-
         if ($projectModel->save()) {
             $folderName = $this->unpacking($projectModel, $model);
-            if ($model->file != 'index.html') {
-                FileHelper::unlink(Yii::getAlias('@filePath') . '/' . $projectModel->file);
-            }
-
+            FileHelper::unlink(Yii::getAlias('@filePath') . '/' . $projectModel->file);
             $result = Project::searchFile($folderName);
             if (!$result) {
+                $this->delete($projectModel);
                 $session = Yii::$app->session;
                 // установка flash-сообщения с названием "projectDeleted"
                 $session->setFlash('projectDeleted', Yii::t('content', 'Your project is not created!'));
@@ -163,12 +160,18 @@ class ProjectController extends Controller
         return $this->redirect(['view', 'id' => $model->id]);
     }
 
+
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
         return $this->redirect(['index']);
     }
 
+    /**
+     * @param $projectModel
+     * @param $model
+     * @return string
+     */
     public function unpacking($projectModel, $model)
     {
         // Load Zippy
@@ -184,11 +187,17 @@ class ProjectController extends Controller
         }
     }
 
+    /**
+     * @param $projectModel
+     */
     public function delete($projectModel)
     {
         $projectModel->delete();
     }
 
+    /**
+     * @return array
+     */
     public function getProjectList(){
         if (Yii::$app->user->identity->isAdmin) {
             $projectList = Project::find()->all();
@@ -199,6 +208,11 @@ class ProjectController extends Controller
         return ArrayHelper::map($projectList, 'id', 'name');
     }
 
+    /**
+     * @param $projectForm
+     * @param null $model
+     * @return bool
+     */
     public function loadAndValidateProject($projectForm, $model = null)
     {
         if (!$projectForm->load(Yii::$app->request->post())) {
@@ -217,6 +231,12 @@ class ProjectController extends Controller
         return true;
     }
 
+    /**
+     * @param $projectForm
+     * @param $model
+     * @return mixed
+     * @throws \yii\base\Exception
+     */
     public function setFile($projectForm, $model)
     {
         if ($projectForm->file) {
@@ -230,6 +250,10 @@ class ProjectController extends Controller
         return $model;
     }
 
+    /**
+     * @param $action
+     * @return \yii\web\Response
+     */
     public function handleError($action)
     {
         $session = Yii::$app->session;
@@ -238,6 +262,11 @@ class ProjectController extends Controller
         return $this->redirect(['create']);
     }
 
+    /**
+     * @param $id
+     * @return Project|null
+     * @throws NotFoundHttpException
+     */
     protected function findModel($id)
     {
         if (($model = Project::findOne($id)) !== null) {

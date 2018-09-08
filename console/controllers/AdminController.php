@@ -23,7 +23,9 @@ class AdminController extends Controller
         $user = new User();
         $login = $this->prompt(':login');
         $password = $this->prompt(':Password');
+        $password_rep = $this->prompt(':Password repeat');
         $user->password = $password;
+        $user->password_repeat = $password_rep;
         $user->setPassword($password);
         $user->login = $login;
         $user->isAdmin = true;
