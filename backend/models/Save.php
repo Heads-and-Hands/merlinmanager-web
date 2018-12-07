@@ -26,7 +26,7 @@ class Save
 
     public static function saveFile($archive, $pathTree)
     {
-        $projectFolder = Yii::getAlias('@filePath') . '/' . $pathTree;
+        $projectFolder = Yii::getAlias('@filePath') . DIRECTORY_SEPARATOR. $pathTree;
         FileHelper::createDirectory($projectFolder);
         $archive->extract($projectFolder);
         return $projectFolder;
