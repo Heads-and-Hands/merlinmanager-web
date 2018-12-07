@@ -104,8 +104,10 @@ class ProjectController extends Controller
         $projectModel = $this->setFile($model, $projectModel);
         if ($projectModel->save()) {
             $folderName = $this->unpacking($projectModel, $model);
+	    try {
             FileHelper::unlink(Yii::getAlias('@filePath') . '/' . $projectModel->file);
-            $result = Project::searchFile($folderName);
+            } catch (\Exception $e) {}
+	    $result = Project::searchFile($folderName);
             if (!$result) {
                 $this->delete($projectModel);
                 $session = Yii::$app->session;
