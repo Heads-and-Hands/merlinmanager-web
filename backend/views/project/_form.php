@@ -1,10 +1,12 @@
 <?php
 
+use common\models\Project;
 use yii\helpers\Html;
+use yii\web\View;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\Project */
+/* @var $model common\models\Project */
 /* @var $form yii\widgets\ActiveForm */
 
 $this->registerJsFile('@web/js/main.js',  ['position' => yii\web\View::POS_END]);
@@ -17,10 +19,13 @@ $this->registerJsFile('@web/js/main.js',  ['position' => yii\web\View::POS_END])
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-    <?php if (Yii::$app->user->identity->getId() == $model->user_id) : ?>
-        <?= $form->field($model, 'secret',
-            [
-                'template' => "{label}\n
+    <?= $form->field($model, 'parent_id')->dropDownList(Project::getProjectList(),[
+        'prompt' => '',
+    ])->label('Parent') ?>
+
+    <?= $form->field($model, 'secret',
+        [
+            'template' => "{label}\n
                     <div class=\"input-group\" >
                       {input}\n
                       <span class=\"input-group-btn\">
@@ -31,16 +36,13 @@ $this->registerJsFile('@web/js/main.js',  ['position' => yii\web\View::POS_END])
                     </div>
                     \n{hint}
                     \n{error}"
-            ])->textInput(['id' => 'secret-input']) ?>
-    <?php endif; ?>
+        ])->textInput(['id' => 'secret-input']) ?>
 
-    <?= $form->field($projectForm, 'file')->fileInput()->label('Archive') ?>
+    <?= $form->field($model, 'file')->fileInput()->label('Archive') ?>
 
-    <?= Html::tag('p', 'or') ?>
+    <?= Html::tag('p','or') ?>
 
-    <?= $form->field($projectForm, 'fileIndex')->fileInput()->label('File') ?>
-
-    <?= $form->field($model, 'status')->checkbox() ?>
+    <?= $form->field($model, 'fileIndex')->fileInput()->label('File') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
@@ -49,5 +51,3 @@ $this->registerJsFile('@web/js/main.js',  ['position' => yii\web\View::POS_END])
     <?php ActiveForm::end(); ?>
 
 </div>
-
-
