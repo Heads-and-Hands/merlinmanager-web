@@ -35,12 +35,6 @@ class Project extends \yii\db\ActiveRecord
         self::STATUS_INACTIVE => 'Не активен',
     ];
 
-    public static function searchFile($folderName)
-    {
-        $files = FileHelper::findFiles($folderName, ['only' => ['index.html'], 'recursive' => FALSE]);
-        return (bool)$files;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -55,7 +49,7 @@ class Project extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'user_id', 'file'], 'required'],
+            [['name', 'user_id'], 'required'],
             [['user_id', 'parent_id', 'status'], 'integer'],
             [['date'], 'safe'],
             [['name'], 'string', 'max' => 100],
@@ -92,6 +86,12 @@ class Project extends \yii\db\ActiveRecord
                 'value'              => new Expression('NOW()'),
             ],
         ];
+    }
+
+    public static function searchFile($folderName)
+    {
+        $files = FileHelper::findFiles($folderName, ['only' => ['index.html'], 'recursive' => false]);
+        return (bool)$files;
     }
 
     /**
@@ -173,4 +173,12 @@ class Project extends \yii\db\ActiveRecord
     {
         return Yii::getAlias('@filePath') . DIRECTORY_SEPARATOR . $this->getPath(DIRECTORY_SEPARATOR) ?? '';
     }
+
+    public function afterDelete()
+    {
+        parent::afterDelete();
+        FileHelper::removeDirectory(Yii::getAlias('@filePath') . '/' . $this->name);
+        FileHelper::removeDirectory(Yii::getAlias('@filePath') . '/' . $this->getTree());
+    }
+
 }

@@ -70,21 +70,20 @@ class m130524_201442_init extends Migration
             'CASCADE'
         );
 
-//        $this->update('{{%user}}', [
-//            'id' => $this->primaryKey()->unsigned(),
-//        ]);
-
-        $this->update('project', [
-//            'id' => $this->primaryKey()->unsigned(),
-            'name' => $this->string(100)->notNull(),
-//            'user_id' => $this->integer()->notNull()->unsigned(),
-//            'parent_id' => $this->integer()->unsigned(),
+        $this->update('{{%user}}', [
+            'id' => $this->primaryKey()->unsigned(),
         ]);
 
-//        $this->update('projectDomain', [
-//            'id' => $this->primaryKey()->unsigned(),
-//            'domain' => $this->string(),
-//        ]);
+        $this->update('project', [
+            'id' => $this->primaryKey()->unsigned(),
+            'name' => $this->string(100)->notNull(),
+            'user_id' => $this->integer()->notNull()->unsigned(),
+            'parent_id' => $this->integer()->unsigned(),
+        ]);
+
+       $this->update('projectDomain', [
+            'id' => $this->primaryKey()->unsigned(),
+        ]);
 
         $this->dropIndex('name', 'project');
     }

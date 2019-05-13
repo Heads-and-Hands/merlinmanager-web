@@ -41,25 +41,18 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'link',
                 'format'    => 'html',
-                'value'     => function ($model) {
-                    $private = Yii::$app->user->identity->getId() == $model->user_id ?? false;
-                    if ($model->secret) {
-                        return $private ? $model->link : 'protected';
-                    } else {
-                        return $model->link;
-                    }
-                }
             ],
             [
                 'attribute' => 'secret',
                 'format'    => 'html',
                 'value'     => function ($model) {
-                    $private = Yii::$app->user->identity->getId() == $model->user_id ?? false;
-                    $url = Html::a( Url::base('http') .
-                        Yii::$app->urlManager->createUrl(['/timing','id'=>$model->secret]), ['timing', 'id' => $model->secret]);
+
                     if ($model->secret) {
-                        return $private ? $url : 'protected';
+                        $url = Html::a( Url::base('http') .
+                            Yii::$app->urlManager->createUrl(['/timing','id'=>$model->secret]), ['timing', 'id' => $model->secret]);
+                        return $url;
                     }
+                    return 'None';
                 }
             ],
             'fullPath',

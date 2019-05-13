@@ -8,7 +8,7 @@ use Yii;
 use common\models\Project;
 use backend\models\ProjectSearch;
 use yii\data\ActiveDataProvider;
-use yii\helpers\ArrayHelper;
+use yii\helpers\FileHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -41,18 +41,18 @@ class ProjectController extends Controller
      */
     public function actionIndex()
     {
+        $searchModel = new ProjectSearch();
         if (!Yii::$app->user->identity->isAdmin) {
             $dataProvider = new ActiveDataProvider([
-                'query' => Project::find()->where(['user_id' => Yii::$app->user->identity->id]),
+                'query' => Project::find()->where(['user_id' => Yii::$app->user->getId()]),
             ]);
         } else {
-            $searchModel = new ProjectSearch();
             $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-            return $this->render('index', [
-                'searchModel'  => $searchModel,
-                'dataProvider' => $dataProvider,
-            ]);
         }
+        return $this->render('index', [
+            'searchModel'  => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
     }
 
     /**
@@ -75,26 +75,41 @@ class ProjectController extends Controller
      */
     public function actionCreate()
     {
-        $model = new ProjectForm();
+        $formModel = new ProjectForm();
         $projectModel = new Project();
-        if ($model->load(Yii::$app->request->post())) {
-            $project = $projectModel::find()->where(['name' => $model->name])->
-            orWhere(['name' => $model->name, 'parent_id' => $model->parent_id])->one();
+        if (FileManager::loadAndValidateProject($formModel)) {
+            $project = $projectModel::find()->where(['name' => $formModel->name])->
+            orWhere(['name' => $formModel->name, 'parent_id' => $formModel->parent_id])->one();
             if (!$project) {
-                $projectModel->name = mb_strtolower($model->name);
-                $projectModel->user_id = Yii::$app->user->identity->getId();
-                $projectModel->parent_id = $model->parent_id;
-                $projectModel->secret = $model->secret;
-                $projectModel->file = 'qw';
+                $formModel->file = UploadedFile::getInstance($formModel, 'file');
+                $formModel->fileIndex = UploadedFile::getInstance($formModel, 'fileIndex');
+                $projectModel->name = mb_strtolower($formModel->name);
+                $projectModel->user_id = Yii::$app->user->getId();
+                $projectModel->parent_id = $formModel->parent_id;
+                $projectModel->secret = $formModel->secret;
+                $projectModel = FileManager::setFile($formModel, $projectModel);
+                if ($projectModel->save()) {
+                    $folderName = FileManager::unpacking($projectModel, $formModel);
+                    if (!FileManager::searchFile($folderName)) {
+                        $this->delete($projectModel);
+                        $session = Yii::$app->session;
+                        $session->setFlash('projectDeleted', 'Your project is not created!');
+                        return $this->redirect(['create']);
+                    }
+                }
                 return $this->redirect(['view', 'id' => $projectModel->id]);
+            } else {
+                $session = Yii::$app->session;
+                $session->setFlash('projectDeleted', 'Проект уже существует');
+                return $this->redirect(['create']);
             }
             return $this->render('create', [
-                'model' => $model,
+                'model' => $formModel,
             ]);
         }
 
         return $this->render('create', [
-            'model' => $model,
+            'model' => $formModel,
         ]);
     }
 
@@ -109,19 +124,42 @@ class ProjectController extends Controller
     {
         $model = $this->findModel($id);
         $projectForm = new ProjectForm();
+        $projectForm->id = $model->id;
+        if (!FileManager::loadAndValidateProject($projectForm, $model)) {
+            return $this->render('update', [
+                'model'       => $model,
+                'projectForm' => $projectForm,
+            ]);
+        }
         if ($model->load(Yii::$app->request->post())) {
-            $project = $model::find()->where(['name' => $projectForm->name])->
-            orWhere(['name' => $projectForm->name, 'parent_id' => $projectForm->parent_id])->one();
-            if (!$project) {
-                $model->name = mb_strtolower($model->name);
-                $model->file = 'qw';
-                $model->save();
-                return $this->redirect(['view', 'id' => $model->id]);
+            $model = FileManager::setFile($projectForm, $model);
+            $pathTree = $model->getTree();
+            if ($projectForm->name != $model->name) {
+                $model->name = $projectForm->name;
+                rename("./tmp/" . $pathTree, "./tmp/" . $model->getTree());
             }
+
+            if (!$model->save()) {
+                return $this->render('update', [
+                    'model'       => $model,
+                    'projectForm' => $projectForm,
+                ]);
+            }
+
+            $tree = $model->getTree();
+            $projectFolder = FileManager::updateArchive($model, $tree, $projectForm);
+            if ($projectForm->file) {
+                FileHelper::unlink(Yii::getAlias('@filePath') . '/' . $model->file);
+            }
+
+            if ($projectFolder && !Project::searchFile($projectFolder)) {
+                $this->handleError($this->action->id);
+            }
+            return $this->redirect(['view', 'id' => $model->id]);
         }
         return $this->render('update', [
-            'projectForm' => $projectForm,
             'model'       => $model,
+            'projectForm' => $projectForm,
         ]);
     }
 
@@ -152,8 +190,8 @@ class ProjectController extends Controller
     {
         $select = Yii::$app->request->post('selection');
         if ($select) {
-            foreach($select as $id){
-                $model= Project::findOne((int)$id);
+            foreach ($select as $id) {
+                $model = Project::findOne((int)$id);
                 $model->status = 1;
                 $model->save();
                 $this->redirect(['project/index']);
@@ -176,5 +214,21 @@ class ProjectController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    public function delete($projectModel)
+    {
+        $projectModel->delete();
+    }
+
+    /**
+     * @param $action
+     * @return \yii\web\Response
+     */
+    public function handleError($action)
+    {
+        $session = Yii::$app->session;
+        $session->setFlash('projectDeleted', Yii::t('content', 'Your project is not created!'));
+        return $this->redirect(['create']);
     }
 }

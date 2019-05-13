@@ -9,6 +9,9 @@ $this->title = 'Create Project';
 $this->params['breadcrumbs'][] = ['label' => 'Projects', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+
+<?= Yii::$app->session->getFlash('projectDeleted') ?>
+
 <div class="project-create">
 
     <h1><?= Html::encode($this->title) ?></h1>
