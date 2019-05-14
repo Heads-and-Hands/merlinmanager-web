@@ -20,8 +20,6 @@ use yii\web\IdentityInterface;
  * @property string $email
  * @property string $auth_key
  * @property integer $status
- * @property integer $created_at
- * @property integer $updated_at
  * @property string $password write-only password
  */
 class User extends ActiveRecord implements IdentityInterface
@@ -43,7 +41,15 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['login', 'password', 'password_repeat'], 'required'],
+            [['login'], 'required'],
+            [
+                ['password', 'password_repeat'], 'required',
+                'when' => function ($model) {
+                    return $model->password || $model->password_repeat;
+                },
+                'whenClient' => 'function() { return $("#user-password").val() || $("#user-password_repeat").val()}'
+            ],
+            [['password'], 'compare', 'compareAttribute' => 'password_repeat'],
             ['name', 'string'],
             ['name', 'default', 'value' => ''],
             ['isAdmin', 'boolean'],
@@ -70,18 +76,6 @@ class User extends ActiveRecord implements IdentityInterface
     {
         throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
     }
-
-    /**
-     * Finds user by username
-     *
-     * @param string $username
-     * @return static|null
-     */
-    public static function findByName($name)
-    {
-        return static::findOne(['name' => $name]);
-    }
-
 
     /**
      * {@inheritdoc}
@@ -136,23 +130,18 @@ class User extends ActiveRecord implements IdentityInterface
         $this->auth_key = Yii::$app->security->generateRandomString();
     }
 
-    public function signup()
-    {
-        if (!$this->validate()) {
-            return null;
-        }
-        if ($this->password_repeat == $this->password) {
-            $this->name = $this->name;
-            $this->setPassword($this->password);
-            $this->generateAuthKey();
-            return $this->save();
-        }
-        return null;
-    }
-
     public function getQuantity()
     {
         return Html::a(Project::find()->where(['user_id' => $this->id])->count(),
             ['/project/index', 'ProjectSearch[user.login]' => $this->login]);
+    }
+
+    public function beforeSave($insert)
+    {
+        if ($this->password) {
+            $this->setPassword($this->password);
+            $this->generateAuthKey();
+        }
+        return parent::beforeSave($insert);
     }
 }

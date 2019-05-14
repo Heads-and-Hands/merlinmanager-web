@@ -21,23 +21,19 @@ class AdminController extends Controller
      */
     public function actionCreate()
     {
-        $name = $this->prompt('Name:');
         $login = $this->prompt('Login:');
         $password = $this->prompt('Password:');
-        $model = new User;
-        $security = \Yii::$app->getSecurity();
-        $model->name = $name;
-        $model->login = $login;
-        $model->auth_key = $security->generateRandomString();
-        $model->isAdmin = true;
-        $model->password = $password;
-        $model->password_hash = $security->generatePasswordHash($password);
-        $model->password_repeat = $password;
-        if(!$model->validate()) {
+        $repeatPassword = $this->prompt('Repeat Password:');
+        $model = new User([
+            'login' => $login,
+            'password' => $password,
+            'password_repeat' => $repeatPassword,
+            'isAdmin' => true,
+        ]);
+
+        if(!$model->save()) {
             print_r('Not Created');
             print_r($model->errors);
-        } else {
-            $model->save();
         }
     }
 }
