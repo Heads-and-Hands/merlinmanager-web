@@ -2,33 +2,22 @@
 
 namespace backend\controllers;
 
+use Alchemy\Zippy\Zippy;
+use backend\forms\DomainForm;
+use common\components\FileManager;
 use Yii;
 use common\models\ProjectDomain;
 use backend\models\DomainSearch;
-use yii\web\Controller;
+use backend\components\Controller;
+use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 /**
  * DomainController implements the CRUD actions for ProjectDomain model.
  */
 class DomainController extends Controller
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
-
     /**
      * Lists all ProjectDomain models.
      * @return mixed
@@ -58,24 +47,6 @@ class DomainController extends Controller
     }
 
     /**
-     * Creates a new ProjectDomain model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-        $model = new ProjectDomain();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
      * Updates an existing ProjectDomain model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param string $id
@@ -85,28 +56,46 @@ class DomainController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $domainForm = new DomainForm();
+        $domainForm->id = $model->id;
+        $domainForm->domain = $model->domain;
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if (!$domainForm->load(Yii::$app->request->post())) {
+            return $this->render('update', [
+                'model' => $domainForm,
+            ]);
         }
 
-        return $this->render('update', [
-            'model' => $model,
-        ]);
+        $domainForm->file = UploadedFile::getInstance($domainForm, 'file');
+        if (!$domainForm->validate()) {
+            return $this->render('update', [
+                'model' => $domainForm,
+            ]);
+        }
+
+        $model->domain = $domainForm->domain;
+        if (!$model->save()) {
+            return $this->render('update', [
+                'model' => $domainForm,
+            ]);
+        }
+
+        if ($domainForm->file->name){
+            $this->updateArchive($domainForm);
+            FileHelper::unlink(Yii::getAlias('@webPath') . '/' . $domainForm->file->name);
+        }
+
+        return $this->redirect(['view', 'id' => $domainForm->id]);
     }
 
-    /**
-     * Deletes an existing ProjectDomain model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionDelete($id)
+    public function updateArchive($domainForm)
     {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
+        $domainForm->file->saveAs(Yii::getAlias('@webPath') . '/' . $domainForm->file->name);
+        $zippy = Zippy::load();
+        $zipAdapter = $zippy->getAdapterFor('zip');
+        $archive = $zipAdapter->open(Yii::getAlias('@webPath') . '/' . $domainForm->file->name);
+        $archive->extract(Yii::getAlias('@webPath'));
+        return true;
     }
 
     /**

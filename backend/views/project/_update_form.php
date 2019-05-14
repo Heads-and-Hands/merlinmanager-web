@@ -1,6 +1,5 @@
 <?php
 
-use common\models\Project;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -42,10 +41,9 @@ $this->registerJsFile('@web/js/main.js', ['position' => yii\web\View::POS_END]);
     <?php if (Yii::$app->user->identity->isAdmin) : ?>
         <?= $form->field($model, 'status')->checkbox() ?>
     <?php endif; ?>
+
     <div class="form-group">
-
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
-
     </div>
 
     <?php ActiveForm::end(); ?>

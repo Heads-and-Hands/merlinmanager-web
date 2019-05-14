@@ -21,7 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </p>
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-    <?= Html::beginForm(['project-selected'],'post');?>
+    <?= Html::beginForm(['project-selected'], 'post'); ?>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel'  => $searchModel,
@@ -42,14 +42,6 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'link',
                 'format'    => 'html',
-                'value'     => function ($model) {
-                    $private = Yii::$app->user->identity->getId() == $model->user_id ?? false;
-                    if ($model->secret) {
-                        return $private ? $model->link : 'protected';
-                    } else {
-                        return $model->link;
-                    }
-                }
             ],
             [
                 'attribute' => 'status',
@@ -67,8 +59,9 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]); ?>
 
-    <?=Html::submitButton('Send', ['class' => 'btn btn-primary']);?>
-
-    <?= Html::endForm();?>
+    <?php if (Yii::$app->user->identity->isAdmin) : ?>
+        <?= Html::submitButton('Send', ['class' => 'btn btn-primary']); ?>
+    <?php endif; ?>
+    <?= Html::endForm(); ?>
 
 </div>

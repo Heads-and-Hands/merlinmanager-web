@@ -14,6 +14,8 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'domain')->textInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model,'file')->fileInput(['maxlength' => true])->label('rsc Archive') ?>
+
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
     </div>

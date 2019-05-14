@@ -7,10 +7,10 @@ use yii\grid\GridView;
 /* @var $searchModel backend\models\DomainSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Project Domains';
+$this->title = 'Domains';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="project-domain-index">
+<div class="domain-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
 

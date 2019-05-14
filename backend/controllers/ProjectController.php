@@ -9,9 +9,8 @@ use common\models\Project;
 use backend\models\ProjectSearch;
 use yii\data\ActiveDataProvider;
 use yii\helpers\FileHelper;
-use yii\web\Controller;
+use backend\components\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 use yii\web\UploadedFile;
 use common\components\FileManager;
 
@@ -20,20 +19,6 @@ use common\components\FileManager;
  */
 class ProjectController extends Controller
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class'   => VerbFilter::class,
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
 
     /**
      * Lists all Project models.
