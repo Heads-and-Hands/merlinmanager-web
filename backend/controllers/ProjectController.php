@@ -11,7 +11,6 @@ use yii\data\ActiveDataProvider;
 use yii\helpers\FileHelper;
 use backend\components\Controller;
 use yii\web\NotFoundHttpException;
-use yii\web\UploadedFile;
 use common\components\FileManager;
 
 /**
@@ -19,7 +18,6 @@ use common\components\FileManager;
  */
 class ProjectController extends Controller
 {
-
     /**
      * Lists all Project models.
      * @return mixed
@@ -60,42 +58,34 @@ class ProjectController extends Controller
      */
     public function actionCreate()
     {
-        $formModel = new ProjectForm();
+        $formModel = new ProjectForm(['isNew' => true]);
         $projectModel = new Project();
-        if (FileManager::loadAndValidateProject($formModel)) {
-            $project = $projectModel::find()->where(['name' => $formModel->name])->
-            orWhere(['name' => $formModel->name, 'parent_id' => $formModel->parent_id])->one();
-            if (!$project) {
-                $formModel->file = UploadedFile::getInstance($formModel, 'file');
-                $formModel->fileIndex = UploadedFile::getInstance($formModel, 'fileIndex');
-                $projectModel->name = mb_strtolower($formModel->name);
-                $projectModel->user_id = Yii::$app->user->getId();
-                $projectModel->parent_id = $formModel->parent_id;
-                $projectModel->secret = $formModel->secret;
-                $projectModel = FileManager::setFile($formModel, $projectModel);
-                if ($projectModel->save()) {
-                    $folderName = FileManager::unpacking($projectModel, $formModel);
-                    if (!FileManager::searchFile($folderName)) {
-                        $this->delete($projectModel);
-                        $session = Yii::$app->session;
-                        $session->setFlash('projectDeleted', 'Your project is not created!');
-                        return $this->redirect(['create']);
-                    }
-                }
-                return $this->redirect(['view', 'id' => $projectModel->id]);
-            } else {
-                $session = Yii::$app->session;
-                $session->setFlash('projectDeleted', 'Проект уже существует');
-                return $this->redirect(['create']);
-            }
+        if (!$formModel->load(Yii::$app->request->post()) || !$formModel->validate()) {
             return $this->render('create', [
                 'model' => $formModel,
             ]);
         }
 
-        return $this->render('create', [
-            'model' => $formModel,
-        ]);
+        $project = $projectModel::find()->where(['name' => $formModel->name, 'parent_id' => $formModel->parent_id])->one();
+        if ($project) {
+            $session = Yii::$app->session;
+            $session->setFlash('projectDeleted', 'Проект уже существует');
+            return $this->redirect(['create']);
+        }
+
+        $projectModel->setAttributes($formModel->getAttributes() + ['user_id' => Yii::$app->user->getId()]);
+        $projectModel = FileManager::setFile($formModel, $projectModel);
+        if ($projectModel->save()) {
+            $folderName = FileManager::unpacking($projectModel, $formModel);
+            if (!FileManager::searchFile($folderName)) {
+                $this->delete($projectModel);
+                $session = Yii::$app->session;
+                $session->setFlash('projectDeleted', 'Your project is not created!');
+                return $this->redirect(['create']);
+            }
+        }
+        return $this->redirect(['view', 'id' => $projectModel->id]);
+
     }
 
     /**
@@ -108,44 +98,40 @@ class ProjectController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $projectForm = new ProjectForm();
-        $projectForm->id = $model->id;
-        if (!FileManager::loadAndValidateProject($projectForm, $model)) {
+        $formModel = new ProjectForm(['id' => $model->id, 'isNew' => false]);
+        if (!$formModel->load(Yii::$app->request->post()) || !$formModel->validate()) {
+            $formModel->setAttributes($model->getAttributes());
             return $this->render('update', [
                 'model'       => $model,
-                'projectForm' => $projectForm,
+                'projectForm' => $formModel,
             ]);
         }
-        if ($model->load(Yii::$app->request->post())) {
-            $model = FileManager::setFile($projectForm, $model);
-            $pathTree = $model->getTree();
-            if ($projectForm->name != $model->name) {
-                $model->name = $projectForm->name;
-                rename("./tmp/" . $pathTree, "./tmp/" . $model->getTree());
-            }
 
-            if (!$model->save()) {
-                return $this->render('update', [
-                    'model'       => $model,
-                    'projectForm' => $projectForm,
-                ]);
-            }
-
-            $tree = $model->getTree();
-            $projectFolder = FileManager::updateArchive($model, $tree, $projectForm);
-            if ($projectForm->file) {
-                FileHelper::unlink(Yii::getAlias('@filePath') . '/' . $model->file);
-            }
-
-            if ($projectFolder && !Project::searchFile($projectFolder)) {
-                $this->handleError($this->action->id);
-            }
-            return $this->redirect(['view', 'id' => $model->id]);
+        $pathTree = $model->getTree();
+        if ($formModel->name != $model->name) {
+            $model->name = $formModel->name;
+            rename("./tmp/" . $pathTree, "./tmp/" . $model->getTree());
         }
-        return $this->render('update', [
-            'model'       => $model,
-            'projectForm' => $projectForm,
-        ]);
+
+        $model->setAttributes(array_filter($formModel->getAttributes(), function($item) { return !is_null($item); }));
+        $model = FileManager::setFile($formModel, $model);
+        if (!$model->save()) {
+            return $this->render('update', [
+                'model'       => $model,
+                'projectForm' => $formModel,
+            ]);
+        }
+
+        $tree = $model->getTree();
+        $projectFolder = FileManager::updateArchive($model, $tree, $formModel);
+        if ($formModel->file) {
+            FileHelper::unlink(Yii::getAlias('@filePath') . '/' . $model->file);
+        }
+
+        if ($projectFolder && !Project::searchFile($projectFolder)) {
+            $this->handleError($this->action->id);
+        }
+        return $this->redirect(['view', 'id' => $model->id]);
     }
 
     /**

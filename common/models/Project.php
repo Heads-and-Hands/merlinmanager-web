@@ -110,6 +110,12 @@ class Project extends \yii\db\ActiveRecord
         return $this->hasMany(Project::class, ['parent_id' => 'id']);
     }
 
+    public function beforeSave($insert)
+    {
+        $this->name = mb_strtolower($this->name);
+        return parent::beforeSave($insert);
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */

@@ -4,7 +4,6 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\Project */
 /* @var $form yii\widgets\ActiveForm */
 
 $this->registerJsFile('@web/js/main.js', ['position' => yii\web\View::POS_END]);
@@ -17,7 +16,7 @@ $this->registerJsFile('@web/js/main.js', ['position' => yii\web\View::POS_END]);
 
     <?= $form->field($projectForm, 'name')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'secret',
+    <?= $form->field($projectForm, 'secret',
         [
             'template' => "{label}\n
                         <div class=\"input-group\" >
@@ -39,7 +38,7 @@ $this->registerJsFile('@web/js/main.js', ['position' => yii\web\View::POS_END]);
     <?= $form->field($projectForm, 'fileIndex')->fileInput()->label('File') ?>
 
     <?php if (Yii::$app->user->identity->isAdmin) : ?>
-        <?= $form->field($model, 'status')->checkbox() ?>
+        <?= $form->field($projectForm, 'status')->checkbox() ?>
     <?php endif; ?>
 
     <div class="form-group">

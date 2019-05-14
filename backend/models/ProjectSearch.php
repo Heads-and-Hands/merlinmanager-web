@@ -25,7 +25,7 @@ class ProjectSearch extends Project
     {
         return [
             [['id', 'user_id', 'parent_id'], 'integer'],
-            [['name', 'user.login'], 'safe'],
+            [['name', 'user.login', 'status'], 'safe'],
         ];
     }
 

@@ -4,6 +4,7 @@ namespace backend\forms;
 
 use common\models\Project;
 use yii\base\Model;
+use yii\web\UploadedFile;
 
 class ProjectForm extends Model
 {
@@ -14,27 +15,45 @@ class ProjectForm extends Model
     public $parent_id;
     public $fileIndex;
     public $status;
-    public $user_id;
+
+    public $isNew;
 
     public function rules()
     {
         return [
             [['name'], 'required'],
             ['name', 'validateName'],
-            ['status', 'integer'],
+            ['status', 'boolean'],
             [['secret'], 'string', 'max' => 250],
             [['name'], 'string', 'max' => 100],
             [['file'], 'file', 'checkExtensionByMimeType' => false, 'extensions' => 'zip'],
             [['fileIndex'], 'file', 'checkExtensionByMimeType' => false, 'extensions' => 'html'],
             [['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => Project::class, 'targetAttribute' => ['parent_id' => 'id']],
             ['file', 'required', 'when'       =>
+                                                   function ($model) {
+                                                       return $model->isNew && !$model->fileIndex;
+                                                   },
+                                   'whenClient' => "function (attribute, value) { return false}"
+            ],
+            ['fileIndex', 'required', 'when'       =>
                                      function ($model) {
-                                         return !$model->fileIndex;
+                                         return $model->isNew && !$model->file;
                                      },
                                  'whenClient' => "function (attribute, value) { return false}"
             ],
+            ['isNew', 'safe'],
         ];
     }
+
+    public function load($data, $formName = null)
+    {
+        if (parent::load($data, $formName)) {
+            $this->file = UploadedFile::getInstance($this, 'file');
+            $this->fileIndex = UploadedFile::getInstance($this, 'fileIndex');
+            return true;
+        }
+
+        return false;    }
 
     public function validateName($attribute)
     {
@@ -54,7 +73,6 @@ class ProjectForm extends Model
             'file'      => 'File',
             'fileIndex' => 'FileIndex',
             'link'      => 'Link',
-            'user_id'   => 'User_id',
         ];
     }
 }

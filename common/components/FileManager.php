@@ -5,7 +5,6 @@ namespace common\components;
 use Alchemy\Zippy\Zippy;
 use yii\helpers\FileHelper;
 use Yii;
-use yii\web\UploadedFile;
 
 class FileManager
 {
@@ -16,7 +15,7 @@ class FileManager
             $zipName = Yii::$app->getSecurity()->generateRandomString();
             $model->file = $zipName . '.' . $projectForm->file->extension;
             $projectForm->file->saveAs(Yii::getAlias('@filePath') . '/' . $model->file);
-        } else {
+        } else if ($projectForm->fileIndex) {
             $model->file = $projectForm->fileIndex->name;
         }
         return $model;
@@ -61,23 +60,6 @@ class FileManager
         FileHelper::createDirectory($projectFolder);
         $archive->extract($projectFolder);
         return $projectFolder;
-    }
-
-    public static function loadAndValidateProject($projectForm, $model = null)
-    {
-        if (!$projectForm->load(Yii::$app->request->post())) {
-            $projectForm->name = $model ? $model->name : '';
-            return false;
-        }
-
-        $projectForm->file = UploadedFile::getInstance($projectForm, 'file');
-        $projectForm->fileIndex = UploadedFile::getInstance($projectForm, 'fileIndex');
-
-        if (!$projectForm->validate()) {
-            $projectForm->name = $model ? $model->name : '';
-            return false;
-        }
-        return true;
     }
 
     public function updateArchive($model, $tree, $projectForm)
