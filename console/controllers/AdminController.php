@@ -4,7 +4,6 @@ namespace console\controllers;
 
 use common\models\User;
 use yii\console\Controller;
-use yii\helpers\ArrayHelper;
 
 /**
  * This is the command line tool for admins.

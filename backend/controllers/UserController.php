@@ -70,7 +70,7 @@ class UserController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post()) && $model->signup()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
