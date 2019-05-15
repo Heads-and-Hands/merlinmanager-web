@@ -150,11 +150,12 @@ class ProjectController extends Controller
 
     public function actionTiming($id)
     {
-        $project = Project::find()->where(['secret' => $id])->one() ?? false;
-        $domain = ProjectDomain::find()->one()->domain ?? false;
-        if ($domain && $project) {
-            $this->redirect($domain . $project->getTree());
+        $project = Project::findOne(['secret' => $id]);
+        if (!$project) {
+            throw new NotFoundHttpException('The requested page does not exist.');
         }
+        
+        Yii::$app->getResponse()->getHeaders()->set('X-Accel-Redirect', '/tmp/' . $project->getTree());
     }
 
     public function actionProjectSelected()
