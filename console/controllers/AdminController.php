@@ -2,7 +2,9 @@
 
 namespace console\controllers;
 
+use common\models\Project;
 use common\models\User;
+use Yii;
 use yii\console\Controller;
 
 /**
@@ -17,7 +19,7 @@ use yii\console\Controller;
 class AdminController extends Controller
 {
     /**
-    Create admin user
+     * Create admin user
      */
     public function actionCreate()
     {
@@ -25,15 +27,24 @@ class AdminController extends Controller
         $password = $this->prompt('Password:');
         $repeatPassword = $this->prompt('Repeat Password:');
         $model = new User([
-            'login' => $login,
-            'password' => $password,
+            'login'           => $login,
+            'password'        => $password,
             'password_repeat' => $repeatPassword,
-            'isAdmin' => true,
+            'isAdmin'         => true,
         ]);
 
-        if(!$model->save()) {
+        if (!$model->save()) {
             print_r('Not Created');
             print_r($model->errors);
+        }
+    }
+
+    public function actionSecret()
+    {
+       $models = Project::find()->where(['secret' => ''])->orWhere(['secret' => null])->all();
+        foreach ($models as $model) {
+            $model->secret = Yii::$app->getSecurity()->generateRandomString();
+            $model->save();
         }
     }
 }

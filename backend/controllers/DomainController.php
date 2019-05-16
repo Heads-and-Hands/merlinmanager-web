@@ -4,7 +4,6 @@ namespace backend\controllers;
 
 use Alchemy\Zippy\Zippy;
 use backend\forms\DomainForm;
-use common\components\FileManager;
 use Yii;
 use common\models\ProjectDomain;
 use backend\models\DomainSearch;

@@ -21,7 +21,7 @@ class ProjectForm extends Model
     public function rules()
     {
         return [
-            [['name'], 'required'],
+            [['name', 'secret'], 'required'],
             ['name', 'validateName'],
             ['status', 'boolean'],
             [['secret'], 'string', 'max' => 250],
@@ -30,16 +30,16 @@ class ProjectForm extends Model
             [['fileIndex'], 'file', 'checkExtensionByMimeType' => false, 'extensions' => 'html'],
             [['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => Project::class, 'targetAttribute' => ['parent_id' => 'id']],
             ['file', 'required', 'when'       =>
-                                                   function ($model) {
-                                                       return $model->isNew && !$model->fileIndex;
-                                                   },
-                                   'whenClient' => "function (attribute, value) { return false}"
-            ],
-            ['fileIndex', 'required', 'when'       =>
                                      function ($model) {
-                                         return $model->isNew && !$model->file;
+                                         return $model->isNew && !$model->fileIndex;
                                      },
                                  'whenClient' => "function (attribute, value) { return false}"
+            ],
+            ['fileIndex', 'required', 'when'       =>
+                                          function ($model) {
+                                              return $model->isNew && !$model->file;
+                                          },
+                                      'whenClient' => "function (attribute, value) { return false}"
             ],
             ['isNew', 'safe'],
         ];
@@ -53,7 +53,8 @@ class ProjectForm extends Model
             return true;
         }
 
-        return false;    }
+        return false;
+    }
 
     public function validateName($attribute)
     {

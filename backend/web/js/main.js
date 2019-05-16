@@ -8,3 +8,7 @@ function random() {
     }
     document.getElementById("secret-input").value = result;
 }
+
+window.onload = function() {
+    random();
+};

@@ -38,12 +38,12 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             'date',
             'file',
+//            [
+//                'attribute' => 'link',
+//                'format'    => 'html',
+//            ],
             [
                 'attribute' => 'link',
-                'format'    => 'html',
-            ],
-            [
-                'attribute' => 'secret',
                 'format'    => 'html',
                 'value'     => function ($model) {
 

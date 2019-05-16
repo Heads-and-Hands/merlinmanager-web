@@ -3,7 +3,6 @@
 namespace backend\controllers;
 
 use backend\forms\ProjectForm;
-use common\models\ProjectDomain;
 use Yii;
 use common\models\Project;
 use backend\models\ProjectSearch;
@@ -85,7 +84,6 @@ class ProjectController extends Controller
             }
         }
         return $this->redirect(['view', 'id' => $projectModel->id]);
-
     }
 
     /**
