@@ -38,23 +38,23 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             'date',
             'file',
-//            [
-//                'attribute' => 'link',
-//                'format'    => 'html',
-//            ],
             [
                 'attribute' => 'link',
                 'format'    => 'html',
-                'value'     => function ($model) {
-
-                    if ($model->secret) {
-                        $url = Html::a( Url::base('http') .
-                            Yii::$app->urlManager->createUrl(['/timing','id'=>$model->secret]), ['timing', 'id' => $model->secret]);
-                        return $url;
-                    }
-                    return 'None';
-                }
             ],
+//            [
+//                'attribute' => 'link',
+//                'format'    => 'html',
+//                'value'     => function ($model) {
+//
+//                    if ($model->secret) {
+//                        $url = Html::a( Url::base('http') .
+//                            Yii::$app->urlManager->createUrl(['/timing','id'=>$model->secret]), ['timing', 'id' => $model->secret]);
+//                        return $url;
+//                    }
+//                    return 'None';
+//                }
+//            ],
             'fullPath',
         ],
     ]) ?>

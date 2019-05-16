@@ -76,6 +76,7 @@ class ProjectSearch extends Project
             'user_id' => $this->user_id,
             'date' => $this->date,
             'parent_id' => $this->parent_id,
+            'status' => $this->status,
         ]);
 
         $query->andFilterWhere(['like', 'project.name', $this->name])

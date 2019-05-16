@@ -4,7 +4,6 @@ use common\models\Project;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\grid\GridView;
-use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\ProjectSearch */
@@ -43,15 +42,6 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'link',
                 'format'    => 'html',
-                'value'     => function ($model) {
-
-                    if ($model->secret) {
-                        $url = Html::a( Url::base('http') .
-                            Yii::$app->urlManager->createUrl(['/timing','id'=>$model->secret]), ['timing', 'id' => $model->secret]);
-                        return $url;
-                    }
-                    return 'None';
-                }
             ],
             [
                 'attribute' => 'status',

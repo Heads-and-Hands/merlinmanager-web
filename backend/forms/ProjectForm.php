@@ -21,7 +21,7 @@ class ProjectForm extends Model
     public function rules()
     {
         return [
-            [['name', 'secret'], 'required'],
+            [['name'], 'required'],
             ['name', 'validateName'],
             ['status', 'boolean'],
             [['secret'], 'string', 'max' => 250],
