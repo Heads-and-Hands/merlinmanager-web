@@ -29,5 +29,7 @@ services:
     networks:
       - default
       - proxy
+    volumes:
+      - "./tmp:/app/backend/web/tmp"
     depends_on:
       - db
