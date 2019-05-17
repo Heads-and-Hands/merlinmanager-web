@@ -61,6 +61,8 @@ class ProjectForm extends Model
         if (strpos($this->name, '/') !== false) {
             $this->addError($attribute, 'Name is incorrect');
         }
+
+        $this->name = mb_strtolower($this->name);
     }
 
     /**
