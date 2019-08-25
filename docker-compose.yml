@@ -21,10 +21,10 @@ services:
     build: .
     restart: always
     ports:
-      - "10080:80"
+      - "10081:80"
     networks:
       - default
     depends_on:
       - db
     volumes:
-      - "/var/www/merlinmanager-web:/app"
+      - "./:/app"

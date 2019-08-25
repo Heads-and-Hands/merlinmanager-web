@@ -13,6 +13,15 @@ return [
     'bootstrap' => ['log'],
     'modules' => [],
     'components' => [
+        'authClientCollection' => [
+            'class' => 'yii\authclient\Collection',
+            'clients' => [
+                'redmine' => [
+                    'class' => 'backend\components\Redmine',
+                    'validateAuthState' => false,
+                ],
+            ],
+        ],
         'request' => [
             'baseUrl' => '',
             'csrfParam' => '_csrf-backend',

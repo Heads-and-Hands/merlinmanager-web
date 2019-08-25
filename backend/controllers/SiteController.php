@@ -1,11 +1,12 @@
 <?php
+
 namespace backend\controllers;
 
+use backend\components\AuthHandler;
+use common\components\MyAuthClient;
 use Yii;
-use yii\web\Controller;
-use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
-use backend\forms\LoginForm;
+use yii\web\Controller;
 
 /**
  * Site controller
@@ -22,20 +23,14 @@ class SiteController extends Controller
                 'class' => AccessControl::class,
                 'rules' => [
                     [
-                        'actions' => ['login', 'error'],
-                        'allow' => true,
+                        'actions' => ['login', 'error', 'redmine-auth'],
+                        'allow'   => true,
                     ],
                     [
                         'actions' => ['logout', 'index'],
-                        'allow' => true,
-                        'roles' => ['@'],
+                        'allow'   => true,
+                        'roles'   => ['@'],
                     ],
-                ],
-            ],
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'logout' => ['post'],
                 ],
             ],
         ];
@@ -74,16 +69,7 @@ class SiteController extends Controller
             return $this->goHome();
         }
 
-        $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
-        } else {
-            $model->password = '';
-
-            return $this->render('login', [
-                'model' => $model,
-            ]);
-        }
+        return $this->render('login');
     }
 
     /**
@@ -95,6 +81,25 @@ class SiteController extends Controller
     {
         Yii::$app->user->logout();
 
+        return $this->goHome();
+    }
+
+    /**
+     * @param null $token
+     * @return \yii\console\Response|\yii\web\Response
+     */
+    public function actionRedmineAuth($token = null)
+    {
+        if (!Yii::$app->user->isGuest) {
+            return $this->goHome();
+        }
+
+        if (!$token) {
+            $oauthClient = new MyAuthClient();
+            $url = $oauthClient->buildAuthUrl();
+            return Yii::$app->getResponse()->redirect($url);
+        }
+        (new AuthHandler($token))->handle();
         return $this->goHome();
     }
 }
