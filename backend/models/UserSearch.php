@@ -18,7 +18,7 @@ class UserSearch extends User
     {
         return [
             [['id', 'isAdmin'], 'integer'],
-            [['name', 'login', 'password_hash', 'auth_key', 'verification_token'], 'safe'],
+            [['name', 'login', 'auth_key',], 'safe'],
         ];
     }
 
@@ -64,9 +64,7 @@ class UserSearch extends User
 
         $query->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'login', $this->login])
-            ->andFilterWhere(['like', 'password_hash', $this->password_hash])
-            ->andFilterWhere(['like', 'auth_key', $this->auth_key])
-            ->andFilterWhere(['like', 'verification_token', $this->verification_token]);
+            ->andFilterWhere(['like', 'auth_key', $this->auth_key]);
 
         return $dataProvider;
     }

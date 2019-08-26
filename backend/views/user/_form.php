@@ -12,14 +12,6 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'login')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'password')->textInput(['maxlength' => true])->label('Password') ?>
-
-    <?= $form->field($model, 'password_repeat')->textInput(['maxlength' => true])->label('Password repeat') ?>
-
     <?= $form->field($model, 'isAdmin')->checkbox() ?>
 
     <div class="form-group">
