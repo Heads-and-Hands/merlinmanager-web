@@ -13,12 +13,12 @@ services:
     build:
       context: ../
       dockerfile: ./docker/dev/Dockerfile_fpm
+    container_name: merlin_backend_fpm
     image: "registry.handh.ru/merlin-manager/backend-dev/fpm:${VERSION}"
     volumes:
       - &app_src app_volume_merlin:/app
-      - ./local/config/fpm/www.conf:/usr/local/etc/php-fpm.d/www.conf
-      - ./local/config/fpm/php.ini:/usr/local/etc/php/php.ini
-    container_name: merlin_backend_fpm
+      - ./dev/config/fpm/www.conf:/usr/local/etc/php-fpm.d/www.conf
+      - ./dev/config/fpm/php.ini:/usr/local/etc/php/php.ini
     labels:
       - "traefik.enable=false"
     networks:
