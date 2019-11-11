@@ -19,6 +19,8 @@ services:
       - ./local/config/fpm/www.conf:/usr/local/etc/php-fpm.d/www.conf
       - ./local/config/fpm/php.ini:/usr/local/etc/php/php.ini
     container_name: merlin_backend_fpm
+    labels:
+      - "traefik.enable=false"
     networks:
       - default
     depends_on:
