@@ -58,6 +58,6 @@ services:
       MYSQL_USER: admin
       MYSQL_PASSWORD: root
     volumes:
-      - merlin-backend-mysql-data:/var/lib/mysql
+      - ./dbdata-dev:/var/lib/mysql
     ports:
       - 9323:5432
