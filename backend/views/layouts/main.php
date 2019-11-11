@@ -37,7 +37,7 @@ AppAsset::register($this);
         ],
     ]);
     $menuItems = [];
-    if (Yii::$app->user->identity->isAdmin) {
+    if (isset(Yii::$app->user->identity->isAdmin)) {
         $menuItems[] = ['label' =>'Users', 'url' => ['/user/index']];
         $menuItems[] = ['label' => 'Settings', 'url' => ['/domain/index']];
     }

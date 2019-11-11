@@ -31,7 +31,7 @@ class m130524_201442_init extends Migration
 
         $this->createTable('{{%project}}', [
             'id' => $this->primaryKey()->unsigned(),
-            'name' => $this->string(100)->notNull()->unique(),
+            'name' => $this->string(100)->notNull(),
             'user_id' => $this->integer()->notNull()->unsigned(),
             'date' => $this->date()->notNull(),
             'file' => $this->string()->notNull(),
@@ -69,23 +69,6 @@ class m130524_201442_init extends Migration
             'id',
             'CASCADE'
         );
-
-        $this->update('{{%user}}', [
-            'id' => $this->primaryKey()->unsigned(),
-        ]);
-
-        $this->update('project', [
-            'id' => $this->primaryKey()->unsigned(),
-            'name' => $this->string(100)->notNull(),
-            'user_id' => $this->integer()->notNull()->unsigned(),
-            'parent_id' => $this->integer()->unsigned(),
-        ]);
-
-       $this->update('projectDomain', [
-            'id' => $this->primaryKey()->unsigned(),
-        ]);
-
-        $this->dropIndex('name', 'project');
     }
 
     public function down()

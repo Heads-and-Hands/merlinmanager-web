@@ -1,0 +1,63 @@
+version: '3.4'
+
+networks:
+  default:
+  proxy:
+    external: true
+
+volumes:
+  app_volume:
+
+services:
+  fpm:
+    build:
+      context: ../
+      dockerfile: ./docker/dev/Dockerfile_fpm
+    image: "registry.handh.ru/merlin-manager/backend-dev/fpm:${VERSION}"
+    volumes:
+      - &app_src app_volume:/app
+      - ./local/config/fpm/www.conf:/usr/local/etc/php-fpm.d/www.conf
+      - ./local/config/fpm/php.ini:/usr/local/etc/php/php.ini
+    container_name: merlin_backend_fpm
+    networks:
+      - default
+    depends_on:
+      - database
+
+  nginx:
+    build:
+      context: ./dev
+      dockerfile: Dockerfile_nginx
+    container_name: merlin_backend_nginx
+    labels:
+      - "traefik.docker.network=proxy"
+      - "traefik.http.services.merlin-manager.loadbalancer.server.port=80"
+      - "traefik.http.routers.merlin-manager.rule=Host(`merlin-manager.hnh-dev.ru`)"
+      - "traefik.http.routers.merlin-manager.entrypoints=websecure"
+      - "traefik.http.routers.merlin-manager.tls.certresolver=myhttpchallenge"
+    restart: always
+    volumes:
+      - *app_src
+      - ./logs-dev/nginx:/var/log/nginx:rw
+    image: "registry.handh.ru/merlin-manager/backend-dev/nginx:${VERSION}"
+    networks:
+      - default
+      - proxy
+    depends_on:
+      - fpm
+
+  database:
+    image: mysql:5.7
+    container_name: merlin_backend_mysql
+    restart: always
+    labels:
+      - "traefik.enable=false"
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: yii
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: root
+    volumes:
+      - merlin-backend-mysql-data:/var/lib/mysql
+    ports:
+      - 9323:5432

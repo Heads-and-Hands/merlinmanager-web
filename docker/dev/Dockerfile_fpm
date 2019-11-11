@@ -1,0 +1,28 @@
+FROM php:7.3-fpm-alpine as base
+
+RUN echo @testing http://nl.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories && \
+    echo /etc/apk/respositories && \
+    apk update && \
+    apk add --no-cache bash wget
+
+RUN set -ex && apk add --no-cache libpng-dev libzip-dev icu-dev libxml2-dev $PHPIZE_DEPS \
+    && docker-php-ext-install pdo_mysql mysqli bcmath mbstring gd sockets \
+    zip iconv intl xml json dom zip opcache \
+    && pecl install xdebug && docker-php-ext-enable xdebug \
+    && rm -rf /var/cache/apk/*
+
+# Install composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+FROM base AS app
+
+COPY ./ /app
+
+WORKDIR /app
+
+RUN composer install && composer update
+
+COPY docker/dev/config/fpm/www.conf /usr/local/etc/php-fpm.d/www.conf
+COPY docker/dev/config/fpm/php.ini /usr/local/etc/php/php.ini
+
+CMD php-fpm

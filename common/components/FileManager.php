@@ -27,8 +27,7 @@ class FileManager
         return (bool)$files;
     }
 
-
-    public function unpacking($projectModel, $model)
+    public static function unpacking($projectModel, $model)
     {
         // Load Zippy
         $zippy = Zippy::load();
