@@ -50,6 +50,9 @@ services:
 
   database:
     image: mysql:5.7
+    networks:
+      - default
+      - proxy
     container_name: merlin_backend_mysql
     restart: always
     labels:
