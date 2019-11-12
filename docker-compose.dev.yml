@@ -27,7 +27,7 @@ services:
 
   app:
     build:
-      context: ./app
+      context: .
       target:  app
     image: "registry.handh.ru/merlin-manager/backend-dev/app:${VERSION}"
     restart: always
