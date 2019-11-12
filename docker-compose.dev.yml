@@ -1,0 +1,39 @@
+version: '3'
+
+networks:
+  proxy:
+    external: true
+  default:
+
+services:
+  db:
+    image: mysql:5.7
+    networks:
+      - default
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: yii
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: root
+    volumes:
+      - "./db:/var/lib/mysql"
+  app:
+    build: .
+      context: ./app
+      target:  app
+    image: "registry.handh.ru/merlin-manager/backend-dev/app:${VERSION}"
+    restart: always
+    labels:
+      - "traefik.docker.network=proxy"
+      - "traefik.http.services.merlin-manager.loadbalancer.server.port=80"
+      - "traefik.http.routers.merlin-manager.rule=Host(`merlin-manager.hnh-dev.ru`)"
+      - "traefik.http.routers.merlin-manager.entrypoints=websecure"
+      - "traefik.http.routers.merlin-manager.tls.certresolver=myhttpchallenge"
+    networks:
+      - default
+      - proxy
+    volumes:
+      - "./app:/app/backend/web/tmp"
+    depends_on:
+      - db

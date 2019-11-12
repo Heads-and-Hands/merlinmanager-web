@@ -4,14 +4,14 @@
       raw: export VERSION={{lookup('env','VERSION')}}
 
     - name: docker build
-      raw: docker-compose -f ../docker/docker-compose.dev.yml build
+      raw: docker-compose -f ../docker-compose.dev.yml build
       #register: docker_compose_build
 
     - name: docker login
       raw: docker login -u test -p {{lookup('env','registrypassword')}} registry.handh.ru
 
     - name: docker push
-      raw: docker-compose -f ../docker/docker-compose.dev.yml push
+      raw: docker-compose -f ../docker-compose.dev.yml push
 
   #- debug:  var=docker_compose_build.stdout_lines
 
@@ -19,7 +19,7 @@
   tasks:
     - name: copy file
       copy:
-        src: ../docker/docker-compose.dev.yml
+        src: ../docker-compose.dev.yml
         dest: /var/www/merlin-manager/docker-compose.dev.yml
     - name: docker-compose pull and down and up
       shell: |
