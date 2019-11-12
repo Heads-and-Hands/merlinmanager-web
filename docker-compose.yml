@@ -1,0 +1,30 @@
+version: '3'
+
+networks:
+  default:
+    driver: bridge
+
+services:
+  db:
+    image: mysql:5.7
+    networks:
+      - default
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: yii
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: root
+    volumes:
+      - "/var/www/share/merlin-web/db:/var/lib/mysql"
+  app:
+    build: .
+    restart: always
+    ports:
+      - "10080:80"
+    networks:
+      - default
+    depends_on:
+      - db
+    volumes:
+      - "/var/www/merlinmanager-web:/app"
