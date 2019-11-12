@@ -1,4 +1,4 @@
-version: '3'
+version: '3.4'
 
 networks:
   proxy:
@@ -10,16 +10,23 @@ services:
     image: mysql:5.7
     networks:
       - default
+      - proxy
+    container_name: merlin_backend_mysql
     restart: always
+    labels:
+      - "traefik.enable=false"
     environment:
       MYSQL_ROOT_PASSWORD: example
       MYSQL_DATABASE: yii
       MYSQL_USER: admin
       MYSQL_PASSWORD: root
     volumes:
-      - "./db:/var/lib/mysql"
+      - ./dbdata-dev:/var/lib/mysql
+    ports:
+      - 9323:5432
+
   app:
-    build: .
+    build:
       context: ./app
       target:  app
     image: "registry.handh.ru/merlin-manager/backend-dev/app:${VERSION}"
@@ -34,6 +41,6 @@ services:
       - default
       - proxy
     volumes:
-      - "./app:/app/backend/web/tmp"
+      - ./app:/app/backend/web/tmp
     depends_on:
       - db
