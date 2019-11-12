@@ -8,6 +8,3 @@ RUN ln -s /etc/nginx/sites-available/nginx.conf /etc/nginx/sites-enabled/nginx.c
 WORKDIR /app
 COPY . /app
 RUN composer install && php init --env=Development --overwrite=y
-
-EXPOSE 80
-EXPOSE 443
