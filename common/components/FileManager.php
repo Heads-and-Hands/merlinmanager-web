@@ -5,6 +5,7 @@ namespace common\components;
 use Alchemy\Zippy\Zippy;
 use yii\helpers\FileHelper;
 use Yii;
+use ZipArchive;
 
 class FileManager
 {
@@ -34,9 +35,21 @@ class FileManager
         // Open an archive
         $pathTree = $projectModel->getTree();
         $zipAdapter = $zippy->getAdapterFor('zip');
+        $folderToDelete = "__MACOSX";
         if ($model->fileIndex) {
             return self::saveIndexFile($model, $pathTree);
         } else {
+            $zip = new ZipArchive;
+            if ($zip->open(Yii::getAlias('@filePath') . DIRECTORY_SEPARATOR . $projectModel->file) === TRUE) {
+                $loop = $zip->numFiles;
+                for ($i = 0; $i < $loop; $i++) {
+                    $entry_info = $zip->statIndex($i);
+                    if(substr($entry_info["name"],0,strlen($folderToDelete))==$folderToDelete){
+                        $zip->deleteIndex($i);
+                    }
+                }
+                $zip->close();
+            }
             $archive = $zipAdapter->open(Yii::getAlias('@filePath') . DIRECTORY_SEPARATOR . $projectModel->file);
             return self::saveFile($archive, $pathTree);
         }
@@ -74,11 +87,11 @@ class FileManager
         } else if ($projectForm->fileIndex) {
             $projectForm->fileIndex->saveAs(Yii::getAlias('@filePath') . $ds . $tree . $model->file);
             $projectFolder = Yii::getAlias('@filePath') . $ds . $tree;
-            $projectRsc = Yii::getAlias('@filePath') . $ds . $tree  . 'rsc';
+            $projectRsc = Yii::getAlias('@filePath') . $ds . $tree . 'rsc';
             if (!file_exists($projectRsc)) {
                 FileHelper::createDirectory($projectRsc);
             }
-            FileHelper::copyDirectory(Yii::getAlias('@rscPath'), $projectFolder  . 'rsc');
+            FileHelper::copyDirectory(Yii::getAlias('@rscPath'), $projectFolder . 'rsc');
             return $projectFolder;
         }
         return false;
